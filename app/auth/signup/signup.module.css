@@ -1,0 +1,207 @@
+.container {
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: var(--off-white);
+  padding: 20px;
+}
+
+.formCard {
+  background: white;
+  border-radius: 16px;
+  box-shadow: var(--shadow-lg);
+  padding: 48px;
+  max-width: 500px;
+  width: 100%;
+  border: 1px solid var(--border-color);
+}
+
+.title {
+  font-size: 32px;
+  font-weight: 700;
+  color: var(--obsidian-dark);
+  text-align: center;
+  margin-bottom: 12px;
+  font-family: var(--font-serif);
+  letter-spacing: -0.5px;
+}
+
+.subtitle {
+  text-align: center;
+  color: var(--text-secondary);
+  font-size: 15px;
+  margin-bottom: 32px;
+  font-family: var(--font-sans);
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.formGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.formGroup label {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-primary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  font-family: var(--font-sans);
+}
+
+.formGroup input,
+.formGroup select {
+  padding: 13px 16px;
+  border: 1px solid var(--border-color);
+  border-radius: 10px;
+  font-size: 15px;
+  transition: var(--transition-base);
+  font-family: var(--font-sans);
+  background: white;
+  color: var(--text-primary);
+}
+
+.formGroup input::placeholder,
+.formGroup select::placeholder {
+  color: var(--text-muted);
+}
+
+.formGroup input:focus,
+.formGroup select:focus {
+  outline: none;
+  border-color: var(--brand-blue);
+  box-shadow: 0 0 0 3px rgba(0, 132, 255, 0.1);
+}
+
+.roleGroup {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+}
+
+.roleOption {
+  position: relative;
+}
+
+.roleOption input[type="radio"] {
+  position: absolute;
+  opacity: 0;
+}
+
+.roleOptionLabel {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 14px 12px;
+  border: 2px solid var(--border-color);
+  border-radius: 10px;
+  cursor: pointer;
+  transition: var(--transition-base);
+  font-size: 14px;
+  font-weight: 600;
+  background: white;
+  color: var(--text-primary);
+}
+
+.roleOption input[type="radio"]:checked + .roleOptionLabel {
+  border-color: var(--brand-blue);
+  background: rgba(0, 132, 255, 0.05);
+  color: var(--brand-blue);
+}
+
+.button {
+  padding: 14px 20px;
+  background: var(--brand-blue);
+  color: white;
+  border: none;
+  border-radius: 10px;
+  font-size: 16px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: var(--transition-base);
+  margin-top: 8px;
+  font-family: var(--font-sans);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.button:hover:not(:disabled) {
+  background: var(--brand-blue-dark);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(0, 132, 255, 0.3);
+}
+
+.button:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.error {
+  background: #fef2f2;
+  color: #7f1d1d;
+  padding: 14px 16px;
+  border-radius: 10px;
+  border-left: 4px solid #ef4444;
+  font-size: 14px;
+  font-family: var(--font-sans);
+  font-weight: 500;
+}
+
+.footer {
+  text-align: center;
+  margin-top: 28px;
+  padding-top: 28px;
+  border-top: 1px solid var(--border-color);
+}
+
+.footer p {
+  color: var(--text-secondary);
+  font-size: 14px;
+  font-family: var(--font-sans);
+}
+
+.footer a {
+  color: var(--brand-blue);
+  text-decoration: none;
+  font-weight: 600;
+  transition: var(--transition-base);
+}
+
+.footer a:hover {
+  color: var(--brand-blue-dark);
+  text-decoration: underline;
+}
+
+@media (max-width: 600px) {
+  .formCard {
+    padding: 32px 24px;
+  }
+
+  .title {
+    font-size: 28px;
+  }
+
+  .subtitle {
+    font-size: 14px;
+    margin-bottom: 24px;
+  }
+
+  .form {
+    gap: 20px;
+  }
+
+  .roleGroup {
+    grid-template-columns: 1fr;
+  }
+}

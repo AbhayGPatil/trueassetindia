@@ -10,7 +10,7 @@ service cloud.firestore {
     // Allow authenticated users to create/read/update properties
     match /properties/{propertyId} {
       allow create: if request.auth.uid != null;
-      allow read: if request.auth.uid != null;
+      allow read: if request.auth.uid != null || resource.data.status == 'active';
       allow update: if request.auth.uid == resource.data.uploadedBy;
       allow delete: if request.auth.uid == resource.data.uploadedBy;
     }

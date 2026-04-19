@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { collection, getDocs, query, limit, orderBy } from 'firebase/firestore';
+import { collection, getDocs, query, where, limit, orderBy } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import PropertyCard from './PropertyCard';
 import styles from './FeaturedPropertiesSection.module.css';
@@ -11,12 +11,14 @@ export default function FeaturedPropertiesSection() {
   const router = useRouter();
   const [properties, setProperties] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
 
   useEffect(() => {
     const fetchProperties = async () => {
       try {
         const q = query(
           collection(db, 'properties'),
+          where('status', '==', 'active'),
           orderBy('createdAt', 'desc'),
           limit(12)
         );
@@ -28,8 +30,10 @@ export default function FeaturedPropertiesSection() {
         }));
 
         setProperties(data);
+        setError('');
       } catch (error) {
         console.error('Error fetching properties:', error);
+        setError(error.message);
         setProperties([]);
       } finally {
         setLoading(false);

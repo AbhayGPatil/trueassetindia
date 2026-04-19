@@ -9,7 +9,7 @@ import styles from './owner-signup.module.css';
 
 export default function OwnerSignupPage() {
   const router = useRouter();
-  const [role, setRole] = useState('owner'); // 'owner' or 'broker'
+  const [role, setRole] = useState('owner'); // 'owner', 'broker', 'developer', or 'notary'
   const [propertyType, setPropertyType] = useState('sell');
   const [formData, setFormData] = useState({
     name: '',
@@ -47,8 +47,27 @@ export default function OwnerSignupPage() {
 
       const user = userCredential.user;
 
-      // Use the selected role directly (owner or broker)
-      const userRole = role; // 'owner' or 'broker'
+      // Use the selected role directly
+      const userRole = role; // 'owner', 'broker', 'developer', or 'notary'
+
+      // Determine free upload limits based on role
+      let freeUploadLimit = 0;
+      switch(userRole) {
+        case 'owner':
+          freeUploadLimit = 2;
+          break;
+        case 'broker':
+          freeUploadLimit = 3;
+          break;
+        case 'developer':
+          freeUploadLimit = 5;
+          break;
+        case 'notary':
+          freeUploadLimit = 2;
+          break;
+        default:
+          freeUploadLimit = 0;
+      }
 
       // Create user profile in Firestore with role-specific data
       const userRef = doc(db, 'users', user.uid);
@@ -66,10 +85,10 @@ export default function OwnerSignupPage() {
           plan: null,
           expiryDate: null,
         },
-        // Different free upload limits for owner vs broker
+        // Role-based free upload limits
         freeUploads: {
           used: 0,
-          limit: userRole === 'owner' ? 2 : (userRole === 'broker' ? 3 : 0),
+          limit: freeUploadLimit,
         },
         // Additional broker-specific data
         ...(userRole === 'broker' && {
@@ -80,11 +99,14 @@ export default function OwnerSignupPage() {
       });
 
       // Redirect to appropriate dashboard based on role
-      if (userRole === 'owner') {
-        router.push('/dashboard/owner');
-      } else if (userRole === 'broker') {
-        router.push('/dashboard/broker');
-      }
+      const dashboardRoutes = {
+        owner: '/dashboard/owner',
+        broker: '/dashboard/broker',
+        developer: '/dashboard/developer',
+        notary: '/dashboard/notary',
+      };
+
+      router.push(dashboardRoutes[userRole] || '/dashboard/owner');
     } catch (err) {
       setError(err.message || 'Signup failed');
     } finally {
@@ -141,23 +163,37 @@ export default function OwnerSignupPage() {
             <form onSubmit={handleSignup}>
               {error && <div className={styles.error}>{error}</div>}
 
-              {/* YOU ARE TOGGLE - Owner or Broker */}
+              {/* YOU ARE TOGGLE - Owner, Broker, Developer, or Notary */}
               <div className={styles.toggleGroup}>
                 <label className={styles.toggleLabel}>You are:</label>
                 <div className={styles.toggleButtons}>
                   <button
                     type="button"
                     className={`${styles.toggleBtn} ${role === 'owner' ? styles.active : ''}`}
-                    onClick={() => setRole('owner')}
+                    onClick={() => router.push('/auth/signup/owner')}
                   >
                     Owner
                   </button>
                   <button
                     type="button"
                     className={`${styles.toggleBtn} ${role === 'broker' ? styles.active : ''}`}
-                    onClick={() => setRole('broker')}
+                    onClick={() => router.push('/auth/signup/broker')}
                   >
                     Broker
+                  </button>
+                  <button
+                    type="button"
+                    className={`${styles.toggleBtn} ${role === 'developer' ? styles.active : ''}`}
+                    onClick={() => router.push('/auth/signup/developer')}
+                  >
+                    Developer
+                  </button>
+                  <button
+                    type="button"
+                    className={`${styles.toggleBtn} ${role === 'notary' ? styles.active : ''}`}
+                    onClick={() => router.push('/auth/signup/notary')}
+                  >
+                    Notary/Advocate
                   </button>
                 </div>
               </div>
@@ -364,25 +400,25 @@ export default function OwnerSignupPage() {
           </p>
           <div className={styles.benefitsGrid}>
             <div className={styles.benefitCard}>
-              <h3 className={styles.benefitCardTitle}>⏱️ Time-Efficient</h3>
+              <h3 className={styles.benefitCardTitle}> Time-Efficient</h3>
               <p className={styles.benefitCardDescription}>
                 Selling your property online can help you save time, manage your bookings at your convenience and receive quality leads quickly.
               </p>
             </div>
             <div className={styles.benefitCard}>
-              <h3 className={styles.benefitCardTitle}>👥 Get Better Exposure</h3>
+              <h3 className={styles.benefitCardTitle}> Get Better Exposure</h3>
               <p className={styles.benefitCardDescription}>
                 A large number of prospective buyers search online. This helps your property get wider exposure to lakhs of buyers present online.
               </p>
             </div>
             <div className={styles.benefitCard}>
-              <h3 className={styles.benefitCardTitle}>💰 Cost-Effective</h3>
+              <h3 className={styles.benefitCardTitle}> Cost-Effective</h3>
               <p className={styles.benefitCardDescription}>
                 By opting to sell online, you can expect a significant reduction in agent fees and overall cost associated with selling a home.
               </p>
             </div>
             <div className={styles.benefitCard}>
-              <h3 className={styles.benefitCardTitle}>🛠️ More Services</h3>
+              <h3 className={styles.benefitCardTitle}>More Services</h3>
               <p className={styles.benefitCardDescription}>
                 TRUE ASSET offers a multitude of property services such as rent agreements, home cleaning, renovation, tenant verification, and more.
               </p>

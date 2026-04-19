@@ -1,11 +1,13 @@
 'use client';
 
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import BlurText from './BlurText';
 import BorderGlow from './BorderGlow';
 import styles from './SearchFilterSection.module.css';
 
 export default function SearchFilterSection() {
+  const router = useRouter();
   const [selectedType, setSelectedType] = useState('buy');
   const [searchQuery, setSearchQuery] = useState('');
 
@@ -21,7 +23,12 @@ export default function SearchFilterSection() {
   const handleSearch = (e) => {
     e.preventDefault();
     if (searchQuery.trim()) {
-      console.log('Searching for:', searchQuery, 'Type:', selectedType);
+      const params = new URLSearchParams();
+      params.set('search', searchQuery.trim());
+      if (selectedType !== 'buy') {
+        params.set('type', selectedType);
+      }
+      router.push(`/listings?${params.toString()}`);
     }
   };
 

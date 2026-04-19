@@ -40,7 +40,7 @@ export default function FeaturedPropertiesSection() {
   }, []);
 
   const handleViewMore = () => {
-    router.push('/login');
+    router.push('/auth/signup');
   };
 
   if (loading) {
@@ -67,8 +67,12 @@ export default function FeaturedPropertiesSection() {
         {properties.length > 0 ? (
           <>
             <div className={styles.propertiesGrid}>
-              {properties.map((property) => (
-                <PropertyCard key={property.id} property={property} />
+              {properties.slice(0, 10).map((property, index) => (
+                <PropertyCard 
+                  key={property.id} 
+                  property={property}
+                  showViewMore={index === 9}
+                />
               ))}
             </div>
 

@@ -49,6 +49,29 @@ export default function SignupPage() {
 
       // Create user profile in Firestore
       const userRef = doc(db, 'users', user.uid);
+      
+      // Determine free uploads based on role
+      let freeUploadLimit = 0;
+      switch(formData.role) {
+        case 'owner':
+          freeUploadLimit = 2;
+          break;
+        case 'broker':
+          freeUploadLimit = 3;
+          break;
+        case 'developer':
+          freeUploadLimit = 5;
+          break;
+        case 'notary':
+          freeUploadLimit = 2;
+          break;
+        case 'buyer':
+          freeUploadLimit = 0;
+          break;
+        default:
+          freeUploadLimit = 0;
+      }
+
       await setDoc(userRef, {
         uid: user.uid,
         name: formData.name,
@@ -63,18 +86,21 @@ export default function SignupPage() {
         },
         freeUploads: {
           used: 0,
-          limit: formData.role === 'owner' ? 2 : (formData.role === 'broker' ? 3 : 0),
+          limit: freeUploadLimit,
         },
       });
 
       // Redirect based on role
-      if (formData.role === 'owner') {
-        router.push('/dashboard/owner');
-      } else if (formData.role === 'broker') {
-        router.push('/dashboard/broker');
-      } else if (formData.role === 'buyer') {
-        router.push('/dashboard/buyer');
-      }
+      const dashboardRoutes = {
+        owner: '/dashboard/owner',
+        broker: '/dashboard/broker',
+        developer: '/dashboard/developer',
+        notary: '/dashboard/notary',
+        buyer: '/dashboard/buyer',
+      };
+
+      const redirectUrl = dashboardRoutes[formData.role] || '/dashboard/buyer';
+      router.push(redirectUrl);
     } catch (err) {
       setError(err.message || 'Signup failed');
     } finally {
@@ -128,16 +154,82 @@ export default function SignupPage() {
 
           <div className={styles.formGroup}>
             <label>I am a *</label>
-            <select
-              name="role"
-              value={formData.role}
-              onChange={handleChange}
-              required
-            >
-              <option value="owner">Property Owner (2 FREE uploads)</option>
-              <option value="broker">Real Estate Broker (3 FREE uploads)</option>
-              <option value="buyer">Property Buyer (Browsing only)</option>
-            </select>
+            <div className={styles.roleGrid}>
+              <label className={styles.roleOptionCard}>
+                <input
+                  type="radio"
+                  name="role"
+                  value="owner"
+                  checked={formData.role === 'owner'}
+                  onChange={handleChange}
+                  required
+                />
+                <span className={styles.roleCardLabel}>
+                  <span className={styles.roleTitle}>Property Owner</span>
+                  <span className={styles.roleDesc}>2 FREE uploads</span>
+                </span>
+              </label>
+
+              <label className={styles.roleOptionCard}>
+                <input
+                  type="radio"
+                  name="role"
+                  value="broker"
+                  checked={formData.role === 'broker'}
+                  onChange={handleChange}
+                  required
+                />
+                <span className={styles.roleCardLabel}>
+                  <span className={styles.roleTitle}>Real Estate Broker</span>
+                  <span className={styles.roleDesc}>3 FREE uploads</span>
+                </span>
+              </label>
+
+              <label className={styles.roleOptionCard}>
+                <input
+                  type="radio"
+                  name="role"
+                  value="developer"
+                  checked={formData.role === 'developer'}
+                  onChange={handleChange}
+                  required
+                />
+                <span className={styles.roleCardLabel}>
+                  <span className={styles.roleTitle}>Developer</span>
+                  <span className={styles.roleDesc}>5 FREE uploads</span>
+                </span>
+              </label>
+
+              <label className={styles.roleOptionCard}>
+                <input
+                  type="radio"
+                  name="role"
+                  value="notary"
+                  checked={formData.role === 'notary'}
+                  onChange={handleChange}
+                  required
+                />
+                <span className={styles.roleCardLabel}>
+                  <span className={styles.roleTitle}>Notary/Advocate</span>
+                  <span className={styles.roleDesc}>2 FREE uploads</span>
+                </span>
+              </label>
+
+              <label className={styles.roleOptionCard}>
+                <input
+                  type="radio"
+                  name="role"
+                  value="buyer"
+                  checked={formData.role === 'buyer'}
+                  onChange={handleChange}
+                  required
+                />
+                <span className={styles.roleCardLabel}>
+                  <span className={styles.roleTitle}>Property Buyer</span>
+                  <span className={styles.roleDesc}>Browsing only</span>
+                </span>
+              </label>
+            </div>
           </div>
 
           <div className={styles.formGroup}>

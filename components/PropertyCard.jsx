@@ -1,14 +1,15 @@
-import Link from 'next/link';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
 import styles from './PropertyCard.module.css';
+import { formatIndianCurrency } from '@/lib/utils/formatCurrency';
+import { SaleIcon, RentIcon, AuctionIcon, LocationIcon } from './Icons/RealEstateIcons';
 
-export default function PropertyCard({ property, onClick }) {
+export default function PropertyCard({ property, showViewMore = false, onViewMoreClick }) {
     const [imageError, setImageError] = useState(false);
     const router = useRouter();
 
-    // Map property data to component props
+    // Map property data
     const id = property.id;
     const image = property.images?.[0] || property.image || '/placeholder.jpg';
     const title = property.title || 'Property';
@@ -16,16 +17,10 @@ export default function PropertyCard({ property, onClick }) {
     const price = property.price || 0;
     const beds = property.bedrooms || property.beds || 0;
     const baths = property.bathrooms || property.baths || 0;
-    const sqft = property.area || property.sqft || 0;
+    const sqft = property.area || property.superArea || 0;
     const type = property.type === 'rent' ? 'For Rent' : 'For Sale';
     const isBankAuction = property.bankAuction || false;
-
-    const handleClick = (e) => {
-        if (onClick) {
-            e.preventDefault();
-            onClick();
-        }
-    };
+    const amenities = property.amenities || [];
 
     const handleViewClick = (e) => {
         e.stopPropagation();
@@ -34,85 +29,105 @@ export default function PropertyCard({ property, onClick }) {
 
     return (
         <motion.div
-            className={styles.card}
-            whileHover={{ y: -8 }}
-            transition={{ duration: 0.3 }}
-            onClick={handleClick}
+            className={styles.gridCard}
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            whileHover={{ y: -4 }}
+            transition={{ duration: 0.2 }}
         >
             {/* IMAGE SECTION */}
-            <div className={styles.imageWrapper}>
+            <div className={styles.cardImageWrapper}>
                 {!imageError ? (
                     <img
                         src={image}
                         alt={title}
-                        className={styles.image}
+                        className={styles.cardImage}
                         onError={() => setImageError(true)}
                     />
                 ) : (
-                    <div className={styles.imageFallback}>📸</div>
+                    <div className={styles.cardImageFallback}>
+                        <span>—</span>
+                    </div>
                 )}
-
-                <div className={styles.badgeContainer}>
-                    <span className={styles.badge}>
-                        {type === 'For Rent' ? '🔑' : '🏠'} {type}
+                
+                {/* BADGES */}
+                <div className={styles.cardBadges}>
+                    <span className={styles.typeBadge}>
+                        {type === 'For Rent' ? (
+                            <><RentIcon size={12} /> For Rent</>
+                        ) : (
+                            <><SaleIcon size={12} /> For Sale</>
+                        )}
                     </span>
                     {isBankAuction && (
-                        <span className={styles.auctionBadge}>🏛️ Auction</span>
+                        <span className={styles.auctionBadge}>
+                            <AuctionIcon size={12} /> Auction
+                        </span>
                     )}
                 </div>
             </div>
 
             {/* CONTENT SECTION */}
-            <div className={styles.content}>
-                <div className={styles.location}>
-                    <span>📍</span>
-                    <p>{location}</p>
+            <div className={styles.cardContent}>
+                {/* PRICE */}
+                <div className={styles.cardPrice}>
+                    {formatIndianCurrency(price)}
                 </div>
 
-                <h3 className={styles.title}>{title}</h3>
+                {/* TITLE */}
+                <h3 className={styles.cardTitle}>{title}</h3>
 
-                <div className={styles.specs}>
-                    {beds > 0 && (
-                        <div className={styles.spec}>
-                            <span>🛏️</span>
-                            <p>{beds} BHK</p>
-                        </div>
-                    )}
-                    {baths > 0 && (
-                        <div className={styles.spec}>
-                            <span>🛁</span>
-                            <p>{baths} Bath</p>
-                        </div>
-                    )}
-                    {sqft > 0 && (
-                        <div className={styles.spec}>
-                            <span>📐</span>
-                            <p>{sqft.toLocaleString()} sqft</p>
-                        </div>
-                    )}
+                {/* LOCATION */}
+                <div className={styles.cardLocation}>
+                    <LocationIcon size={14} />
+                    <span>{location}</span>
                 </div>
 
-                {/* FOOTER */}
-                <div className={styles.footer}>
-                    <div className={styles.priceSection}>
-                        <span className={styles.price}>
-                            ₹{(price / 100000).toFixed(0)}L
-                        </span>
-                        {type === 'For Rent' && (
-                            <span className={styles.period}>/month</span>
+                {/* SPECS BAR */}
+                <div className={styles.specsBar}>
+                    {beds > 0 && <span>{beds} BHK</span>}
+                    {baths > 0 && <span className={styles.specDivider}>|</span>}
+                    {baths > 0 && <span>{baths} Bath</span>}
+                    {sqft > 0 && <span className={styles.specDivider}>|</span>}
+                    {sqft > 0 && <span>{sqft.toLocaleString()} sqft</span>}
+                </div>
+
+                {/* AMENITIES PILLS */}
+                {amenities.length > 0 && (
+                    <div className={styles.amenitiesPills}>
+                        {amenities.slice(0, 3).map((amenity, idx) => (
+                            <span key={idx} className={styles.pill}>
+                                {amenity}
+                            </span>
+                        ))}
+                        {amenities.length > 3 && (
+                            <span className={styles.pillMore}>
+                                +{amenities.length - 3}
+                            </span>
                         )}
                     </div>
+                )}
 
-                    <motion.button
-                        className={styles.viewBtn}
-                        whileHover={{ scale: 1.05 }}
-                        whileTap={{ scale: 0.95 }}
-                        onClick={handleViewClick}
+                {/* VIEW MORE LINK (10th card only) */}
+                {showViewMore && (
+                    <a 
+                        href="/login" 
+                        className={styles.viewMoreLink}
                     >
-                        View →
-                    </motion.button>
-                </div>
+                        View more...
+                    </a>
+                )}
             </div>
+
+            {/* VIEW DETAILS BUTTON */}
+            <motion.button
+                className={styles.cardButton}
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                onClick={handleViewClick}
+            >
+                View Details
+            </motion.button>
         </motion.div>
     );
 }

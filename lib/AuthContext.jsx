@@ -107,6 +107,23 @@ export function AuthProvider({ children }) {
     }
   };
 
+  /**
+   * Refresh user profile from Firestore (used after subscription updates)
+   */
+  const refreshUserProfile = async (userId) => {
+    try {
+      const userDocRef = doc(db, 'users', userId);
+      const userDocSnap = await getDoc(userDocRef);
+      if (userDocSnap.exists()) {
+        setUserProfile(userDocSnap.data());
+        return userDocSnap.data();
+      }
+    } catch (error) {
+      console.error('Error refreshing user profile:', error);
+      throw error;
+    }
+  };
+
   const value = {
     user,
     userProfile,
@@ -114,6 +131,7 @@ export function AuthProvider({ children }) {
     signup,
     login,
     logout,
+    refreshUserProfile,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

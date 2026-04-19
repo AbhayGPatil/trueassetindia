@@ -1,23 +1,35 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+import { useState, useEffect, Suspense } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { collection, getDocs, query, where, Query } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import { useFilterStore } from '@/lib/filterStore';
+import HorizontalFilterBar from '@/components/HorizontalFilterBar';
 import AdvancedFilters from '@/components/AdvancedFilters';
 import PropertyCard from '@/components/PropertyCard';
 import styles from './listings.module.css';
 import { motion } from 'framer-motion';
 
-export default function ListingsPage() {
+export const dynamic = 'force-dynamic';
+
+function ListingsPageContent() {
   const router = useRouter();
-  const { filters } = useFilterStore();
+  const searchParams = useSearchParams();
+  const { filters, setPropertyCategory } = useFilterStore();
   const [properties, setProperties] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [sorting, setSorting] = useState('relevance');
   const [showFilters, setShowFilters] = useState(true);
+
+  // Check for type URL parameter and apply filter on mount
+  useEffect(() => {
+    const typeParam = searchParams.get('type');
+    if (typeParam && !filters.propertyCategory) {
+      setPropertyCategory(typeParam);
+    }
+  }, [searchParams]);
 
   // Load properties whenever filters change
   useEffect(() => {
@@ -30,6 +42,11 @@ export default function ListingsPage() {
     // Location filter
     if (filters.location.city) {
       constraints.push(where('city', '==', filters.location.city));
+    }
+
+    // Property category filter
+    if (filters.propertyCategory) {
+      constraints.push(where('propertyCategory', '==', filters.propertyCategory));
     }
 
     // Property type filter
@@ -107,8 +124,8 @@ export default function ListingsPage() {
 
   return (
     <div className={styles.pageContainer}>
-      {/* HERO HEADER */}
-      <header className={styles.heroHeader}>
+      {/* CONDENSED HERO HEADER - Sleek Top Bar */}
+      <header className={styles.heroHeaderCondensed}>
         <button 
           onClick={() => router.back()}
           className={styles.backButton}
@@ -118,63 +135,40 @@ export default function ListingsPage() {
           <span>←</span> Back
         </button>
 
-        <div className={styles.heroContent}>
-          <h1 className={styles.heroTitle}>Find Your Dream Property</h1>
-          <p className={styles.heroSubtitle}>
-            {loading ? 'Loading properties...' : `${properties.length ?? 0} verified listings available`}
+        <div className={styles.heroContentCondensed}>
+          <h1 className={styles.heroTitleSerif}>Find Your Dream Property</h1>
+          <p className={styles.heroStatLine}>
+            {loading ? 'Loading properties...' : `Showing ${properties.length ?? 0} Luxury Residencies${filters.location.city ? ` in ${filters.location.city}` : ''} | 100% Verified`}
           </p>
-        </div>
-
-        <div className={styles.heroStats}>
-          <div className={styles.stat}>
-            <span className={styles.statNumber}>{properties.length ?? 0}</span>
-            <span className={styles.statLabel}>Properties</span>
-          </div>
-          <div className={styles.stat}>
-            <span className={styles.statNumber}>✓</span>
-            <span className={styles.statLabel}>Verified</span>
-          </div>
         </div>
       </header>
 
-      {/* FILTER AND SORT BAR */}
-      <div className={styles.controlBar}>
-        <div className={styles.controlBarContent}>
-          <button 
-            className={styles.filterToggle}
-            onClick={() => setShowFilters(!showFilters)}
-            aria-label="Toggle filters"
-          >
-            <span>⚙️</span> Filters
-          </button>
+      {/* FLOATING FILTER CARD */}
+      <div className={styles.floatingFilterContainer}>
+        <HorizontalFilterBar onAllFiltersClick={() => setShowFilters(!showFilters)} />
+      </div>
 
-          <div className={styles.sortContainer}>
-            <label htmlFor="sort" className={styles.sortLabel}>Sort by:</label>
-            <select
-              id="sort"
-              value={sorting}
-              onChange={(e) => setSorting(e.target.value)}
-              className={styles.sortSelect}
-            >
-              <option value="relevance">Most Relevant</option>
-              <option value="price-low">Price: Low to High</option>
-              <option value="price-high">Price: High to Low</option>
-              <option value="newest">Newest First</option>
-            </select>
-          </div>
-
-          <div className={styles.viewCount}>
-            Showing {properties.length} results
-          </div>
+      {/* BREADCRUMBS & SORTING */}
+      <div className={styles.breadcrumbSection}>
+        <div className={styles.breadcrumbTrail}>
+          <span>Home</span>
+          <span className={styles.separator}>/</span>
+          <span>{filters.location.city || 'Properties'}</span>
+          {filters.location.area && (
+            <>
+              <span className={styles.separator}>/</span>
+              <span>{filters.location.area}</span>
+            </>
+          )}
         </div>
       </div>
 
       {/* MAIN CONTENT */}
-      <div className={styles.mainContainer}>
-        {/* LEFT SIDEBAR - FILTERS (COLLAPSIBLE ON MOBILE) */}
+      <div className={styles.mainContainerRefactored}>
+        {/* LEFT SIDEBAR - ADVANCED FILTERS (COLLAPSIBLE) */}
         <aside className={`${styles.filterSidebar} ${showFilters ? styles.filterSidebarOpen : ''}`}>
           <div className={styles.filterHeader}>
-            <h3>Filters</h3>
+            <h3>Advanced Filters</h3>
             <button 
               onClick={() => setShowFilters(false)}
               className={styles.closeFilters}
@@ -188,6 +182,30 @@ export default function ListingsPage() {
 
         {/* RIGHT CONTENT - RESULTS */}
         <section className={styles.resultsSection}>
+          {/* RESULTS HEADER WITH SORTING */}
+          <div className={styles.resultsHeaderProfessional}>
+            <p className={styles.resultCountProfessional}>
+              Showing <span className={styles.resultNumber}>{properties.length}</span> properties
+              {filters.location.city && <span> in <strong>{filters.location.city}</strong></span>}
+            </p>
+
+            <div className={styles.sortContainerProfessional}>
+              <label htmlFor="sort" className={styles.sortLabel}>Sort by:</label>
+              <select
+                id="sort"
+                value={sorting}
+                onChange={(e) => setSorting(e.target.value)}
+                className={styles.sortSelectProfessional}
+              >
+                <option value="relevance">Most Relevant</option>
+                <option value="price-low">Price: Low to High</option>
+                <option value="price-high">Price: High to Low</option>
+                <option value="newest">Newest First</option>
+              </select>
+            </div>
+          </div>
+
+          {/* ERROR BANNER */}
           {error && (
             <div className={styles.errorBanner}>
               <span>⚠️ {error}</span>
@@ -197,6 +215,7 @@ export default function ListingsPage() {
             </div>
           )}
 
+          {/* LOADING STATE */}
           {loading ? (
             <div className={styles.loadingState}>
               <motion.div
@@ -243,5 +262,13 @@ export default function ListingsPage() {
         </section>
       </div>
     </div>
+  );
+}
+
+export default function ListingsPage() {
+  return (
+    <Suspense fallback={<div className={styles.pageContainer}>Loading...</div>}>
+      <ListingsPageContent />
+    </Suspense>
   );
 }

@@ -14,7 +14,7 @@ const PLANS_MAP = {
 function CheckoutContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
-  const { user, userProfile: profile } = useContext(AuthContext);
+  const { user, userProfile: profile, refreshUserProfile } = useContext(AuthContext);
   const rawPlanId = searchParams.get('plan');
   const planId = rawPlanId?.toLowerCase(); // Ensure lowercase
   const [loading, setLoading] = useState(false);
@@ -110,6 +110,8 @@ function CheckoutContent() {
           },
           handler: async (response) => {
             try {
+              console.log('✅ [CHECKOUT] Payment successful, verifying...');
+              
               const verifyResponse = await fetch('/api/razorpay/verify-payment', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -128,6 +130,8 @@ function CheckoutContent() {
 
               const verifyData = await verifyResponse.json();
               if (verifyData.success) {
+                console.log('✅ [CHECKOUT] Payment verified, activating subscription...');
+                
                 // Call utility function to activate subscription
                 const { activateSubscription } = await import('@/lib/uploadLimitUtils');
                 await activateSubscription(
@@ -138,9 +142,20 @@ function CheckoutContent() {
                   response.razorpay_payment_id
                 );
                 
-                router.push('/dashboard/owner?status=success');
+                console.log('✅ [CHECKOUT] Subscription activated, refreshing profile...');
+                
+                // Refresh user profile to show updated subscription
+                await refreshUserProfile(user.uid);
+                
+                // Redirect to appropriate dashboard based on user role
+                const userRole = profile?.role || 'owner';
+                const dashboardPath = userRole === 'broker' ? '/dashboard/broker' : '/dashboard/owner';
+                
+                console.log('✅ [CHECKOUT] Payment complete, redirecting to', dashboardPath);
+                router.push(`${dashboardPath}?status=success`);
               }
             } catch (err) {
+              console.error('❌ [CHECKOUT] Payment handler error:', err);
               setError('Payment verification failed: ' + err.message);
               setLoading(false);
             }

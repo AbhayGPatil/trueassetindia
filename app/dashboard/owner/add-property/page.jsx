@@ -18,6 +18,8 @@ import {
   getDownloadURL 
 } from 'firebase/storage';
 import { db, storage } from '@/lib/firebase';
+import AmenitiesSelector from '@/components/AmenitiesSelector';
+import KeyHighlightsSelector from '@/components/KeyHighlightsSelector';
 import styles from './add-property.module.css';
 
 export default function AddPropertyPage() {
@@ -30,13 +32,21 @@ export default function AddPropertyPage() {
     location: '',
     price: '',
     type: 'sell', // or 'rent'
+    propertyCategory: '', // apartment, villa, plot, penthouse, commercial, rowhouse
     bedrooms: '',
     bathrooms: '',
     area: '', // in sq ft
+    layout: '', // 1BHK, 2BHK, etc
+    superArea: '', // Super area in sq ft
+    superAreaUnit: 'sqft', // sqft or sqm
+    furnishing: '', // SEMI, FULL, NOT
+    facing: '', // EAST, WEST, SOUTH, NORTH, NE, NW, SE, SW
     amenities: '', // comma separated
+    keyHighlights: '', // comma separated
   });
 
   const [images, setImages] = useState([]);
+  const [videos, setVideos] = useState([]);
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
@@ -74,8 +84,17 @@ export default function AddPropertyPage() {
     setImages(prev => [...prev, ...files]);
   };
 
+  const handleVideoChange = (e) => {
+    const files = Array.from(e.target.files);
+    setVideos(prev => [...prev, ...files]);
+  };
+
   const removeImage = (index) => {
     setImages(prev => prev.filter((_, i) => i !== index));
+  };
+
+  const removeVideo = (index) => {
+    setVideos(prev => prev.filter((_, i) => i !== index));
   };
 
   const handleSubmit = async (e) => {
@@ -113,13 +132,25 @@ export default function AddPropertyPage() {
       
       for (let i = 0; i < images.length; i++) {
         const file = images[i];
-        const storageRef = ref(storage, `properties/${user.uid}/${Date.now()}_${i}_${file.name}`);
+        const storageRef = ref(storage, `properties/${user.uid}/${Date.now()}_img_${i}_${file.name}`);
         await uploadBytes(storageRef, file);
         const downloadURL = await getDownloadURL(storageRef);
         imageUrls.push(downloadURL);
       }
 
+      // Upload videos to Firebase Storage
+      const videoUrls = [];
+      
+      for (let i = 0; i < videos.length; i++) {
+        const file = videos[i];
+        const storageRef = ref(storage, `properties/${user.uid}/${Date.now()}_vid_${i}_${file.name}`);
+        await uploadBytes(storageRef, file);
+        const downloadURL = await getDownloadURL(storageRef);
+        videoUrls.push(downloadURL);
+      }
+
       console.log('✅ Images uploaded:', imageUrls);
+      console.log('✅ Videos uploaded:', videoUrls);
 
       // Save property to Firestore
       const propertyData = {
@@ -128,14 +159,23 @@ export default function AddPropertyPage() {
         location: formData.location,
         price: parseFloat(formData.price),
         type: formData.type,
+        propertyCategory: formData.propertyCategory,
         bedrooms: formData.bedrooms ? parseInt(formData.bedrooms) : 0,
         bathrooms: formData.bathrooms ? parseInt(formData.bathrooms) : 0,
         area: formData.area ? parseFloat(formData.area) : 0,
+        layout: formData.layout,
+        superArea: formData.superArea ? parseFloat(formData.superArea) : 0,
+        superAreaUnit: formData.superAreaUnit,
+        furnishing: formData.furnishing,
+        facing: formData.facing,
         amenities: formData.amenities ? formData.amenities.split(',').map(a => a.trim()) : [],
+        keyHighlights: formData.keyHighlights ? formData.keyHighlights.split(',').map(h => h.trim()) : [],
         images: imageUrls,
+        videos: videoUrls,
         uploadedBy: user.uid,
         ownerName: userProfile?.name || 'Unknown',
         ownerEmail: user.email,
+        ownerPhone: userProfile?.whatsapp || userProfile?.phone || '',
         createdAt: serverTimestamp(),
         status: 'active',
       };
@@ -158,12 +198,20 @@ export default function AddPropertyPage() {
         location: '',
         price: '',
         type: 'sell',
+        propertyCategory: '',
         bedrooms: '',
         bathrooms: '',
         area: '',
+        layout: '',
+        superArea: '',
+        superAreaUnit: 'sqft',
+        furnishing: '',
+        facing: '',
         amenities: '',
+        keyHighlights: '',
       });
       setImages([]);
+      setVideos([]);
 
       // Redirect to dashboard after 2 seconds
       setTimeout(() => {
@@ -264,6 +312,25 @@ export default function AddPropertyPage() {
                 <option value="rent">For Rent</option>
               </select>
             </div>
+
+            <div className={styles.form_group}>
+              <label htmlFor="propertyCategory">Property Category *</label>
+              <select
+                id="propertyCategory"
+                name="propertyCategory"
+                value={formData.propertyCategory}
+                onChange={handleInputChange}
+                required
+              >
+                <option value="">Select Category</option>
+                <option value="apartment">Apartment</option>
+                <option value="villa">Villa</option>
+                <option value="plot">Plot</option>
+                <option value="penthouse">Penthouse</option>
+                <option value="commercial">Commercial</option>
+                <option value="rowhouse">Row House</option>
+              </select>
+            </div>
           </div>
 
           <div className={styles.form_row}>
@@ -317,17 +384,107 @@ export default function AddPropertyPage() {
                 placeholder="e.g., 2"
               />
             </div>
+
+            <div className={styles.form_group}>
+              <label htmlFor="layout">Layout</label>
+              <select
+                id="layout"
+                name="layout"
+                value={formData.layout}
+                onChange={handleInputChange}
+              >
+                <option value="">Select Layout</option>
+                <option value="1BHK">1 BHK</option>
+                <option value="2BHK">2 BHK</option>
+                <option value="3BHK">3 BHK</option>
+                <option value="4BHK">4 BHK</option>
+                <option value="5BHK">5 BHK</option>
+                <option value="Studio">Studio</option>
+                <option value="Penthouse">Penthouse</option>
+              </select>
+            </div>
+          </div>
+
+          <div className={styles.form_row}>
+            <div className={styles.form_group}>
+              <label htmlFor="superArea">Super Area</label>
+              <div style={{ display: 'flex', gap: '10px' }}>
+                <input
+                  type="number"
+                  id="superArea"
+                  name="superArea"
+                  value={formData.superArea}
+                  onChange={handleInputChange}
+                  placeholder="e.g., 1800"
+                  style={{ flex: 1 }}
+                />
+                <select
+                  name="superAreaUnit"
+                  value={formData.superAreaUnit}
+                  onChange={handleInputChange}
+                  style={{ width: '100px' }}
+                >
+                  <option value="sqft">Sq.ft</option>
+                  <option value="sqm">Sq.m</option>
+                </select>
+              </div>
+            </div>
+
+            <div className={styles.form_group}>
+              <label htmlFor="furnishing">Furnishing</label>
+              <select
+                id="furnishing"
+                name="furnishing"
+                value={formData.furnishing}
+                onChange={handleInputChange}
+              >
+                <option value="">Select Furnishing</option>
+                <option value="NOT">Not Furnished</option>
+                <option value="SEMI">Semi Furnished</option>
+                <option value="FULL">Fully Furnished</option>
+              </select>
+            </div>
+
+            <div className={styles.form_group}>
+              <label htmlFor="facing">Facing</label>
+              <select
+                id="facing"
+                name="facing"
+                value={formData.facing}
+                onChange={handleInputChange}
+              >
+                <option value="">Select Facing</option>
+                <option value="EAST">East</option>
+                <option value="WEST">West</option>
+                <option value="SOUTH">South</option>
+                <option value="NORTH">North</option>
+                <option value="NORTHEAST">North East</option>
+                <option value="NORTHWEST">North West</option>
+                <option value="SOUTHEAST">South East</option>
+                <option value="SOUTHWEST">South West</option>
+              </select>
+            </div>
           </div>
 
           <div className={styles.form_group}>
-            <label htmlFor="amenities">Amenities (comma separated)</label>
-            <input
-              type="text"
-              id="amenities"
-              name="amenities"
+            <label>Key Highlights - Why Choose This Property?</label>
+            <KeyHighlightsSelector
+              value={formData.keyHighlights}
+              onChange={(value) => setFormData(prev => ({
+                ...prev,
+                keyHighlights: value
+              }))}
+            />
+          </div>
+
+          <div className={styles.form_group}>
+            <label>Amenities</label>
+            <AmenitiesSelector
               value={formData.amenities}
-              onChange={handleInputChange}
-              placeholder="e.g., Parking, Gym, Pool, Garden"
+              onChange={(value) => setFormData(prev => ({
+                ...prev,
+                amenities: value
+              }))}
             />
           </div>
 
@@ -344,6 +501,18 @@ export default function AddPropertyPage() {
             <p className={styles.help_text}>Max 5 images recommended</p>
           </div>
 
+          <div className={styles.form_group}>
+            <label htmlFor="videos">Upload Videos (Optional)</label>
+            <input
+              type="file"
+              id="videos"
+              multiple
+              accept="video/*"
+              onChange={handleVideoChange}
+            />
+            <p className={styles.help_text}>Supported: MP4, WebM, OGG (Max 100MB per video)</p>
+          </div>
+
           {images.length > 0 && (
             <div className={styles.image_preview}>
               <h3>Selected Images ({images.length})</h3>
@@ -354,6 +523,26 @@ export default function AddPropertyPage() {
                     <button
                       type="button"
                       onClick={() => removeImage(index)}
+                      className={styles.remove_btn}
+                    >
+                      Remove
+                    </button>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {videos.length > 0 && (
+            <div className={styles.image_preview}>
+              <h3>Selected Videos ({videos.length})</h3>
+              <div className={styles.image_grid}>
+                {videos.map((file, index) => (
+                  <div key={index} className={styles.image_item}>
+                    <p>🎥 {file.name}</p>
+                    <button
+                      type="button"
+                      onClick={() => removeVideo(index)}
                       className={styles.remove_btn}
                     >
                       Remove

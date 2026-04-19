@@ -1,60 +1,72 @@
 'use client';
 
-import StarBorder from './StarBorder';
+import { CheckCircle, Shield, Users, Zap } from 'lucide-react';
+import { useRouter } from 'next/navigation';
 import styles from './FeaturesSection.module.css';
 
 export default function FeaturesSection() {
+  const router = useRouter();
+
   const features = [
     {
       id: 1,
-      icon: '✓',
-      title: '100% Verified Properties',
-      description: 'All properties legally verified'
+      icon: CheckCircle,
+      title: '100% VERIFIED PROPERTIES',
+      description: 'Every property undergoes rigorous legal verification and authentication to ensure your complete peace of mind.'
     },
     {
       id: 2,
-      icon: '🛡️',
-      title: 'Safe Transactions',
-      description: 'Secure from start to finish'
+      icon: Shield,
+      title: 'SECURE TRANSACTIONS',
+      description: 'Industry-leading security protocols protect every step of your investment journey from inquiry to closure.'
     },
     {
       id: 3,
-      icon: '👥',
-      title: 'Expert Agents',
-      description: 'Dedicated support 24/7'
+      icon: Users,
+      title: 'EXPERT AGENTS',
+      description: 'Our dedicated team of specialists provides personalized guidance and support twenty-four hours a day.'
     },
     {
       id: 4,
-      icon: '⚡',
-      title: 'Fast Process',
-      description: 'Quick approvals and closures'
+      icon: Zap,
+      title: 'ACCELERATED PROCESS',
+      description: 'Streamlined workflows and efficient approvals get you from selection to closure faster than traditional methods.'
     }
   ];
+
+  const handleLearnMore = () => {
+    router.push('/about');
+  };
 
   return (
     <section className={styles.featuresSection}>
       <div className={styles.container}>
-        <h2 className={styles.title}>Why Choose TrueAssets</h2>
-        <p className={styles.subtitle}>Experience luxury real estate with confidence and ease</p>
+        <div className={styles.headerWrapper}>
+          <h2 className={styles.title}>Why Choose TrueAssets</h2>
+          <p className={styles.subtitle}>Experience luxury real estate with confidence and ease</p>
+        </div>
         
         <div className={styles.featuresGrid}>
-          {features.map((feature) => (
-            <StarBorder
-              key={feature.id}
-              as="div"
-              className={styles.starBorderWrapper}
-              color="cyan"
-              speed="5s"
-            >
-              <div className={styles.featureCard}>
+          {features.map((feature) => {
+            const IconComponent = feature.icon;
+            return (
+              <div key={feature.id} className={styles.featureItem}>
                 <div className={styles.iconWrapper}>
-                  <span className={styles.icon}>{feature.icon}</span>
+                  <IconComponent className={styles.icon} strokeWidth={1} size={32} />
                 </div>
-                <h3 className={styles.featureTitle}>{feature.title}</h3>
-                <p className={styles.featureDescription}>{feature.description}</p>
+                <div className={styles.contentWrapper}>
+                  <h3 className={styles.featureTitle}>{feature.title}</h3>
+                  <p className={styles.featureDescription}>{feature.description}</p>
+                </div>
               </div>
-            </StarBorder>
-          ))}
+            );
+          })}
+        </div>
+
+        <div className={styles.ctaWrapper}>
+          <button onClick={handleLearnMore} className={styles.learnMoreLink}>
+            Our Process <span className={styles.arrow}>→</span>
+          </button>
         </div>
       </div>
     </section>

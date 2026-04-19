@@ -31,7 +31,6 @@ export default function BrokerDashboard() {
       if (!user) return;
 
       try {
-        // Fetch properties
         const propertiesQuery = query(
           collection(db, 'properties'),
           where('uploadedBy', '==', user.uid)
@@ -39,7 +38,6 @@ export default function BrokerDashboard() {
         const propertiesSnapshot = await getDocs(propertiesQuery);
         setProperties(propertiesSnapshot.docs.map(doc => ({ ...doc.data(), id: doc.id })));
 
-        // Fetch interested clients
         const interestedQuery = query(
           collection(db, 'interestedVisitors'),
           where('ownerId', '==', user.uid)
@@ -69,137 +67,178 @@ export default function BrokerDashboard() {
 
   return (
     <div className={styles.container}>
-      {/* BACK BUTTON */}
-      <button 
-        onClick={() => router.push('/')}
-        className={styles.backButton}
-        title="Back to Home"
-      >
-        ← Back to Home
-      </button>
-      <header className={styles.header}>
-        <div>
-          <h1>Welcome, {profile?.name}!</h1>
-          <p>Your broker property management dashboard</p>
-        </div>
-        <button onClick={() => router.push('/subscription')} className={styles.headerBtn}>
-          {isSubscribed ? '✓ Subscribed' : '+ Upgrade Plan'}
+      <div className={styles.topBar}>
+        <button onClick={() => router.push('/')} className={styles.logoBtn}>
+          ← TrueAssets
         </button>
-      </header>
-
-      <div className={styles.statsGrid}>
-        <div className={styles.statCard}>
-          <div className={styles.statIcon}>�</div>
-          <div>
-            <p className={styles.statLabel}>Properties Listed</p>
-            <p className={styles.statValue}>{properties.length}</p>
-          </div>
-        </div>
-
-        <div className={styles.statCard}>
-          <div className={styles.statIcon}>�</div>
-          <div>
-            <p className={styles.statLabel}>Interested Visitors</p>
-            <p className={styles.statValue}>{interestedClients.length}</p>
-          </div>
-        </div>
-
-        <div className={styles.statCard}>
-          <div className={styles.statIcon}>↑</div>
-          <div>
-            <p className={styles.statLabel}>Free Uploads Left</p>
-            <p className={styles.statValue}>{isSubscribed ? '∞' : uploadsRemaining}/3</p>
-          </div>
-        </div>
-
-        <div className={styles.statCard}>
-          <div className={styles.statIcon}>★</div>
-          <div>
-            <p className={styles.statLabel}>Subscription Status</p>
-            <p className={styles.statValue} style={{ color: isSubscribed ? '#0066FF' : '#ff6b35' }}>
-              {isSubscribed ? 'Active' : 'Free'}
-            </p>
-          </div>
+        <div className={styles.userMenu}>
+          <span className={styles.userRole}>Property Broker</span>
+          <button onClick={() => router.push('/subscription')} className={styles.upgradeBtn}>
+            {isSubscribed ? 'Premium Active' : 'Upgrade'}
+          </button>
         </div>
       </div>
 
-      {profile?.subscription?.expiryDate && (
-        <div className={styles.subscriptionBanner}>
-          <p>
-            <strong>Active Plan:</strong> {profile?.subscription?.plan} 
-            {' • '}
-            <strong>Expires:</strong> {new Date(profile?.subscription?.expiryDate).toLocaleDateString()}
-          </p>
-        </div>
-      )}
-
-      <section className={styles.section}>
-        <div className={styles.sectionHeader}>
-          <h2>My Properties</h2>
-          <button onClick={() => router.push('/dashboard/broker/add-property')} className={styles.addBtn}>
-            + Add New Property
-          </button>
+      <div className={styles.content}>
+        <div className={styles.header}>
+          <div>
+            <h1 className={styles.title}>Welcome, {profile?.name}</h1>
+            <p className={styles.subtitle}>Manage your brokerage portfolio and track client interests</p>
+          </div>
         </div>
 
-        {properties.length === 0 ? (
-          <div className={styles.emptyState}>
-            <p>No properties listed yet</p>
-            <button onClick={() => router.push('/dashboard/broker/add-property')} className={styles.addBtn}>
-              + List Your First Property
+        <div className={styles.statsContainer}>
+          <div className={styles.statBox}>
+            <div className={styles.statBoxTop}>
+              <span className={styles.statLabel}>Total Properties</span>
+              <div className={styles.statIcon}>▪</div>
+            </div>
+            <div className={styles.statValue}>{properties.length}</div>
+            <p className={styles.statDesc}>Listed in portfolio</p>
+          </div>
+
+          <div className={styles.statBox}>
+            <div className={styles.statBoxTop}>
+              <span className={styles.statLabel}>Interested Clients</span>
+              <div className={styles.statIcon}>●</div>
+            </div>
+            <div className={styles.statValue}>{interestedClients.length}</div>
+            <p className={styles.statDesc}>Active inquiries</p>
+          </div>
+
+          <div className={styles.statBox}>
+            <div className={styles.statBoxTop}>
+              <span className={styles.statLabel}>Uploads Left</span>
+              <div className={styles.statIcon}>◆</div>
+            </div>
+            <div className={styles.statValue}>{isSubscribed ? '∞' : uploadsRemaining}</div>
+            <p className={styles.statDesc}>{isSubscribed ? 'Unlimited uploads' : 'Free tier limit'}</p>
+          </div>
+
+          <div className={styles.statBox}>
+            <div className={styles.statBoxTop}>
+              <span className={styles.statLabel}>Account Status</span>
+              <div className={styles.statIcon}>★</div>
+            </div>
+            <div className={styles.statValue} style={{ color: isSubscribed ? '#0084ff' : '#666' }}>
+              {isSubscribed ? 'Premium' : 'Free'}
+            </div>
+            <p className={styles.statDesc}>{isSubscribed ? 'Full access' : 'Limited access'}</p>
+          </div>
+        </div>
+
+        {profile?.subscription?.expiryDate && (
+          <div className={styles.bannerBox}>
+            <span className={styles.bannerLabel}>Plan Details:</span>
+            <span>{profile?.subscription?.plan}</span>
+            <span className={styles.bulletSeparator}>•</span>
+            <span>Expires: {new Date(profile?.subscription?.expiryDate).toLocaleDateString()}</span>
+          </div>
+        )}
+
+        {profile?.agencyName && (
+          <div className={styles.agencyBanner}>
+            <span className={styles.agencyLabel}>Agency Name:</span>
+            <span>{profile?.agencyName}</span>
+            {profile?.brokerLicense && (
+              <>
+                <span className={styles.bulletSeparator}>•</span>
+                <span className={styles.licenseLabel}>License:</span>
+                <span>{profile?.brokerLicense}</span>
+              </>
+            )}
+          </div>
+        )}
+
+        <div className={styles.section}>
+          <div className={styles.sectionTop}>
+            <h2 className={styles.sectionTitle}>Your Properties</h2>
+            <button 
+              onClick={() => router.push('/dashboard/broker/add-property')} 
+              className={styles.primaryBtn}
+            >
+              List New Property
             </button>
           </div>
-        ) : (
-          <div className={styles.propertiesGrid}>
-            {properties.map(prop => (
-              <div key={prop.id} className={styles.propertyCard}>
-                {prop.images && prop.images.length > 0 && (
-                  <img 
-                    src={prop.images[0]} 
-                    alt={prop.title}
-                    className={styles.propertyImage}
-                  />
-                )}
-                <div className={styles.propertyInfo}>
-                  <h3>{prop.title}</h3>
-                  <p className={styles.price}>₹{prop.price?.toLocaleString('en-IN')}</p>
-                  <p className={styles.location}>{prop.location}</p>
-                  <p className={styles.type}>{prop.type === 'sell' ? 'For Sale' : 'For Rent'}</p>
-                  <button 
-                    onClick={() => router.push(`/property/${prop.id}`)}
-                    className={styles.viewBtn}
-                  >
-                    View Details
-                  </button>
-                </div>
-              </div>
-            ))}
-          </div>
-        )}
-      </section>
 
-      <section className={styles.section}>
-        <h2>📋 Interested Visitors</h2>
-        {interestedClients.length === 0 ? (
-          <div className={styles.emptyState}>
-            <p>No interested visitors yet</p>
-          </div>
-        ) : (
-          <div className={styles.table}>
-            <div className={styles.tableHeader}>
-              <span>Email</span>
-              <span>Property</span>
-              <span>Marked At</span>
+          {properties.length === 0 ? (
+            <div className={styles.emptyState}>
+              <div className={styles.emptyIcon}>📋</div>
+              <p className={styles.emptyTitle}>No properties in portfolio</p>
+              <p className={styles.emptyText}>Start listing properties to build your brokerage portfolio</p>
+              <button 
+                onClick={() => router.push('/dashboard/broker/add-property')}
+                className={styles.primaryBtn}
+              >
+                List Your First Property
+              </button>
             </div>
-            {interestedClients.map(client => (
-              <div key={client.id} className={styles.tableRow}>
-                <span>{client.visitorEmail}</span>
-                <span>{client.propertyTitle}</span>
-                <span>{client.markedAt ? new Date(client.markedAt.toDate()).toLocaleDateString() : '-'}</span>
+          ) : (
+            <div className={styles.propertiesGrid}>
+              {properties.map(prop => (
+                <div key={prop.id} className={styles.propertyCard}>
+                  <div className={styles.propImageContainer}>
+                    {prop.images && prop.images.length > 0 ? (
+                      <img 
+                        src={prop.images[0]} 
+                        alt={prop.title}
+                        className={styles.propImage}
+                      />
+                    ) : (
+                      <div className={styles.propImagePlaceholder}>Image</div>
+                    )}
+                  </div>
+                  <div className={styles.propContent}>
+                    <h3 className={styles.propTitle}>{prop.title}</h3>
+                    <p className={styles.propPrice}>₹{prop.price?.toLocaleString('en-IN')}</p>
+                    <p className={styles.propLocation}>{prop.location}</p>
+                    <div className={styles.propMeta}>
+                      <span className={styles.propType}>
+                        {prop.type === 'sell' ? 'For Sale' : 'For Rent'}
+                      </span>
+                    </div>
+                    <button 
+                      onClick={() => router.push(`/property/${prop.id}`)}
+                      className={styles.viewLink}
+                    >
+                      View Details →
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+
+        <div className={styles.section}>
+          <h2 className={styles.sectionTitle}>Client Interests</h2>
+          
+          {interestedClients.length === 0 ? (
+            <div className={styles.emptyState}>
+              <div className={styles.emptyIcon}>👥</div>
+              <p className={styles.emptyTitle}>No client interests yet</p>
+              <p className={styles.emptyText}>Clients who show interest will appear here</p>
+            </div>
+          ) : (
+            <div className={styles.interestedTable}>
+              <div className={styles.tableHead}>
+                <div className={styles.tableCol1}>Client Email</div>
+                <div className={styles.tableCol2}>Property</div>
+                <div className={styles.tableCol3}>Date</div>
               </div>
-            ))}
-          </div>
-        )}
-      </section>
+              {interestedClients.map(client => (
+                <div key={client.id} className={styles.tableRow}>
+                  <div className={styles.tableCol1}>{client.visitorEmail}</div>
+                  <div className={styles.tableCol2}>{client.propertyTitle}</div>
+                  <div className={styles.tableCol3}>
+                    {client.markedAt ? new Date(client.markedAt.toDate()).toLocaleDateString() : '-'}
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      </div>
     </div>
   );
 }

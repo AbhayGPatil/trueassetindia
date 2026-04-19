@@ -1,3 +1,4 @@
+/* ===== FEATURED SECTION ===== */
 .featuredSection {
   position: relative;
   width: 100%;
@@ -12,11 +13,11 @@
 
 .title {
   font-size: 2.5rem;
-  font-weight: 700;
+  font-weight: 800;
   color: #1a1a1a;
   text-align: center;
   margin: 0 0 10px 0;
-  letter-spacing: 0.5px;
+  letter-spacing: -0.5px;
 }
 
 .subtitle {
@@ -27,28 +28,75 @@
   line-height: 1.6;
 }
 
-/* Properties Grid */
+/* ===== RESPONSIVE GRID LAYOUT ===== */
 .propertiesGrid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-  gap: 25px;
+  grid-template-columns: 1fr;
+  gap: 24px;
   margin-bottom: 50px;
 }
 
-/* Loading State */
+/* Mobile: 1 column */
+@media (min-width: 640px) {
+  .propertiesGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+/* Tablet: 2 columns */
+@media (min-width: 768px) {
+  .propertiesGrid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+/* Desktop: 3-4 columns */
+@media (min-width: 1024px) {
+  .propertiesGrid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+/* Large desktop: Keep 4 */
+@media (min-width: 1440px) {
+  .propertiesGrid {
+    grid-template-columns: repeat(4, 1fr);
+    gap: 28px;
+  }
+}
+
+/* ===== LOADING STATE ===== */
 .loadingGrid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-  gap: 25px;
+  grid-template-columns: 1fr;
+  gap: 24px;
   margin-bottom: 50px;
+}
+
+@media (min-width: 640px) {
+  .loadingGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 768px) {
+  .loadingGrid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (min-width: 1024px) {
+  .loadingGrid {
+    grid-template-columns: repeat(4, 1fr);
+  }
 }
 
 .loadingCard {
-  height: 350px;
+  height: 400px;
   background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
   background-size: 200% 100%;
   animation: loading 1.5s infinite;
-  border-radius: 8px;
+  border-radius: 12px;
 }
 
 @keyframes loading {
@@ -60,48 +108,50 @@
   }
 }
 
-/* View More Section */
+/* ===== VIEW MORE SECTION (GLOBAL CTA) ===== */
 .viewMoreContainer {
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 15px;
-  padding: 40px;
+  padding: 50px 40px;
   background: linear-gradient(135deg, #f8f9fa 0%, #e8f0f7 100%);
   border-radius: 12px;
   text-align: center;
+  border: 1px solid #e0e8f5;
 }
 
 .viewMoreButton {
-  padding: 14px 40px;
-  font-size: 1.1rem;
+  padding: 14px 42px;
+  font-size: 1.05rem;
   font-weight: 700;
-  background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+  background: linear-gradient(135deg, #0084ff 0%, #0066cc 100%);
   color: #ffffff;
   border: none;
-  border-radius: 6px;
+  border-radius: 8px;
   cursor: pointer;
   transition: all 0.3s ease;
-  letter-spacing: 0.5px;
+  letter-spacing: 0.3px;
 }
 
 .viewMoreButton:hover {
   transform: translateY(-2px);
-  box-shadow: 0 10px 30px rgba(52, 152, 219, 0.3);
+  box-shadow: 0 10px 30px rgba(0, 132, 255, 0.3);
 }
 
 .viewMoreButton:active {
   transform: translateY(0);
-  box-shadow: 0 5px 15px rgba(52, 152, 219, 0.3);
+  box-shadow: 0 5px 15px rgba(0, 132, 255, 0.2);
 }
 
 .viewMoreText {
   font-size: 0.95rem;
   color: #666;
   margin: 0;
+  line-height: 1.5;
 }
 
-/* No Properties */
+/* ===== NO PROPERTIES STATE ===== */
 .noProperties {
   text-align: center;
   padding: 60px 20px;
@@ -115,10 +165,7 @@
   margin: 0;
 }
 
-/* ============================================
-   RESPONSIVE DESIGN
-   ============================================ */
-
+/* ===== RESPONSIVE ADJUSTMENTS ===== */
 @media (max-width: 1024px) {
   .featuredSection {
     padding: 50px 20px;
@@ -128,14 +175,8 @@
     font-size: 2rem;
   }
 
-  .propertiesGrid,
-  .loadingGrid {
-    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-    gap: 20px;
-  }
-
   .viewMoreContainer {
-    padding: 30px;
+    padding: 40px 30px;
   }
 
   .viewMoreButton {
@@ -146,32 +187,64 @@
 
 @media (max-width: 768px) {
   .featuredSection {
-    padding: 40px 15px;
+    padding: 40px 16px;
   }
 
   .title {
     font-size: 1.8rem;
-    margin-bottom: 8px;
   }
 
   .subtitle {
     font-size: 1rem;
+  }
+
+  .propertiesGrid,
+  .loadingGrid {
+    gap: 16px;
+  }
+
+  .viewMoreContainer {
+    padding: 32px 24px;
+    gap: 12px;
+  }
+
+  .viewMoreButton {
+    padding: 11px 30px;
+    font-size: 0.95rem;
+  }
+
+  .viewMoreText {
+    font-size: 0.9rem;
+  }
+}
+
+@media (max-width: 640px) {
+  .featuredSection {
+    padding: 32px 12px;
+  }
+
+  .title {
+    font-size: 1.5rem;
+  }
+
+  .subtitle {
+    font-size: 0.95rem;
     margin-bottom: 30px;
   }
 
   .propertiesGrid,
   .loadingGrid {
-    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-    gap: 15px;
-  }
-
-  .viewMoreContainer {
-    padding: 25px;
     gap: 12px;
   }
 
+  .viewMoreContainer {
+    padding: 24px 16px;
+  }
+
   .viewMoreButton {
-    padding: 12px 30px;
+    width: 100%;
+    padding: 10px 20px;
+    font-size: 0.9rem;
   }
 }
 

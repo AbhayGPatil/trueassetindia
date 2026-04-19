@@ -1,0 +1,156 @@
+.container {
+  width: 100%;
+  margin: 2rem 0;
+  padding: 1.5rem;
+  background: linear-gradient(135deg, #f8f9ff 0%, #f0f4ff 100%);
+  border-radius: 12px;
+  border: 2px solid #e0e8ff;
+}
+
+.title {
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: #1a3a8a;
+  margin: 0 0 0.5rem 0;
+  text-align: left;
+}
+
+.subtitle {
+  font-size: 0.9rem;
+  color: #64748b;
+  margin: 0 0 1.5rem 0;
+}
+
+.categoryTabs {
+  display: flex;
+  gap: 0.75rem;
+  margin-bottom: 1.5rem;
+  flex-wrap: wrap;
+}
+
+.categoryTab {
+  padding: 0.6rem 1.2rem;
+  border: 2px solid #cbd5e1;
+  background: white;
+  color: #334155;
+  border-radius: 20px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 0.9rem;
+  transition: all 0.3s ease;
+}
+
+.categoryTab:hover {
+  border-color: #3b82f6;
+  color: #3b82f6;
+  transform: translateY(-2px);
+}
+
+.categoryTab.active {
+  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+  color: white;
+  border-color: #2563eb;
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+}
+
+.highlightsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.highlightButton {
+  position: relative;
+  padding: 1rem;
+  border: 2px solid #e2e8f0;
+  background: white;
+  border-radius: 10px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  transition: all 0.3s ease;
+  text-align: left;
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: #334155;
+}
+
+.highlightButton:hover {
+  border-color: #3b82f6;
+  background: #f0f9ff;
+  transform: translateY(-3px);
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.15);
+}
+
+.highlightButton.selected {
+  background: linear-gradient(135deg, #e0f2fe 0%, #bfdbfe 100%);
+  border-color: #0284c7;
+  box-shadow: 0 4px 12px rgba(2, 132, 199, 0.2);
+}
+
+.checkmark {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 4px;
+  background: white;
+  border: 2px solid #cbd5e1;
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: transparent;
+  transition: all 0.3s ease;
+  flex-shrink: 0;
+}
+
+.highlightButton.selected .checkmark {
+  background: #0284c7;
+  border-color: #0284c7;
+  color: white;
+}
+
+.highlightName {
+  flex: 1;
+  word-wrap: break-word;
+}
+
+.selectedCount {
+  text-align: center;
+  padding-top: 1rem;
+  border-top: 1px solid #e2e8f0;
+}
+
+.selectedCount p {
+  margin: 0;
+  font-size: 0.9rem;
+  color: #0284c7;
+  font-weight: 600;
+}
+
+@media (max-width: 768px) {
+  .container {
+    padding: 1rem;
+  }
+
+  .highlightsGrid {
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 0.75rem;
+  }
+
+  .categoryTabs {
+    gap: 0.5rem;
+  }
+
+  .categoryTab {
+    padding: 0.5rem 1rem;
+    font-size: 0.8rem;
+  }
+
+  .highlightButton {
+    padding: 0.75rem;
+    font-size: 0.85rem;
+  }
+}

@@ -16,10 +16,18 @@ service firebase.storage {
     }
 
     // Allow authenticated users to upload developer project images and videos
-    match /developer-projects/{allPaths=**} {
+    // Path: developer-projects/{uid}/{filename}
+    match /developer-projects/{userId}/{filename} {
       allow read: if true;
       allow write: if request.auth != null;
-      allow delete: if request.auth != null;
+      allow delete: if request.auth.uid == userId;
+    }
+
+    // Allow authenticated users to upload under developer-projects subdirectories
+    match /developer-projects/{userId}/{allPaths=**} {
+      allow read: if true;
+      allow write: if request.auth != null;
+      allow delete: if request.auth.uid == userId;
     }
 
     // Deny everything else

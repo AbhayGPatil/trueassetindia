@@ -3,7 +3,7 @@
 import { useState, useContext } from 'react';
 import { useRouter } from 'next/navigation';
 import { AuthContext } from '@/lib/AuthContext';
-import { db, storage } from '@/lib/firebase';
+import { auth, db, storage } from '@/lib/firebase';
 import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import AmenitiesSelector from '@/components/AmenitiesSelector';
@@ -53,8 +53,8 @@ export default function LaunchProjectPage() {
     nearbyStation: '',
     selectedLayouts: [], // Array of layout types
     layoutSizes: {}, // { '1RK': 450, '1BHK': 650, ... }
-    amenities: [],
-    keyHighlights: [],
+    amenities: '', // Comma-separated string
+    keyHighlights: '', // Comma-separated string
     areaSize: '',
   });
 
@@ -145,11 +145,22 @@ export default function LaunchProjectPage() {
 
     try {
       if (!user) throw new Error('User not authenticated');
+      
+      console.log('=== UPLOAD DEBUG ===');
+      console.log('User UID:', user.uid);
+      console.log('User Email:', user.email);
+      console.log('Auth object:', auth ? 'Present' : 'Missing');
+      console.log('Storage object:', storage ? 'Present' : 'Missing');
+      
       if (!formData.projectName) throw new Error('Project name is required');
       if (!formData.city) throw new Error('City is required');
       if (!formData.location) throw new Error('Location is required');
       if (formData.selectedLayouts.length === 0) throw new Error('Select at least one layout');
       if (files.images.length === 0) throw new Error('Upload at least one image');
+
+      // Get fresh auth token
+      const token = await user.getIdToken(true);
+      console.log('Fresh ID token obtained');
 
       // Upload files to Firebase Storage
       const uploadedImageUrls = [];
@@ -158,25 +169,45 @@ export default function LaunchProjectPage() {
 
       // Upload images
       for (const image of files.images) {
-        const imageRef = ref(storage, `developer-projects/${user.uid}/${Date.now()}-${image.name}`);
-        await uploadBytes(imageRef, image);
-        const url = await getDownloadURL(imageRef);
-        uploadedImageUrls.push(url);
+        try {
+          const storagePath = `developer-projects/${user.uid}/${Date.now()}-${image.name}`;
+          console.log('📤 Uploading to:', storagePath);
+          const imageRef = ref(storage, storagePath);
+          await uploadBytes(imageRef, image);
+          const url = await getDownloadURL(imageRef);
+          uploadedImageUrls.push(url);
+          console.log('✅ Image uploaded');
+        } catch (imgError) {
+          console.error('Image upload error:', imgError);
+          throw new Error(`Image upload failed: ${imgError.message}`);
+        }
       }
 
       // Upload videos
       for (const video of files.videos) {
-        const videoRef = ref(storage, `developer-projects/${user.uid}/${Date.now()}-${video.name}`);
-        await uploadBytes(videoRef, video);
-        const url = await getDownloadURL(videoRef);
-        uploadedVideoUrls.push(url);
+        try {
+          const videoRef = ref(storage, `developer-projects/${user.uid}/${Date.now()}-${video.name}`);
+          console.log('Uploading video to:', `developer-projects/${user.uid}/${Date.now()}-${video.name}`);
+          await uploadBytes(videoRef, video);
+          const url = await getDownloadURL(videoRef);
+          uploadedVideoUrls.push(url);
+        } catch (vidError) {
+          console.error('Video upload error:', vidError);
+          throw new Error(`Video upload failed: ${vidError.message}`);
+        }
       }
 
       // Upload NA Certificate if provided
       if (files.naCertificate) {
-        const naCertRef = ref(storage, `developer-projects/${user.uid}/na-certificate-${Date.now()}`);
-        await uploadBytes(naCertRef, files.naCertificate);
-        naCertificateUrl = await getDownloadURL(naCertRef);
+        try {
+          const naCertRef = ref(storage, `developer-projects/${user.uid}/na-certificate-${Date.now()}`);
+          console.log('Uploading NA certificate to:', `developer-projects/${user.uid}/na-certificate-${Date.now()}`);
+          await uploadBytes(naCertRef, files.naCertificate);
+          naCertificateUrl = await getDownloadURL(naCertRef);
+        } catch (certError) {
+          console.error('NA certificate upload error:', certError);
+          throw new Error(`Certificate upload failed: ${certError.message}`);
+        }
       }
 
       // Save project to Firestore
@@ -195,8 +226,8 @@ export default function LaunchProjectPage() {
         nearbyStation: formData.nearbyStation,
         selectedLayouts: formData.selectedLayouts,
         layoutSizes: formData.layoutSizes,
-        amenities: formData.amenities,
-        keyHighlights: formData.keyHighlights,
+        amenities: formData.amenities ? formData.amenities.split(',').map(a => a.trim()) : [],
+        keyHighlights: formData.keyHighlights ? formData.keyHighlights.split(',').map(h => h.trim()) : [],
         images: uploadedImageUrls,
         videos: uploadedVideoUrls,
         status: 'active',
@@ -495,7 +526,7 @@ export default function LaunchProjectPage() {
 
           <AmenitiesSelector
             value={formData.amenities}
-            onChange={(amenities) => setFormData(prev => ({ ...prev, amenities: amenities }))}
+            onChange={(amenities) => setFormData(prev => ({ ...prev, amenities }))}
           />
         </div>
 

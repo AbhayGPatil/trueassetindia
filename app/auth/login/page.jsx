@@ -54,6 +54,10 @@ export default function LoginPage() {
         router.push('/dashboard/owner');
       } else if (userProfile.role === 'broker') {
         router.push('/dashboard/broker');
+      } else if (userProfile.role === 'developer') {
+        router.push('/dashboard/developer');
+      } else if (userProfile.role === 'notary') {
+        router.push('/dashboard/notary');
       } else if (userProfile.role === 'buyer') {
         router.push('/dashboard/buyer');
       } else {

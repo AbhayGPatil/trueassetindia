@@ -154,7 +154,7 @@ export default function DeveloperDashboard() {
           <div className={styles.sectionTop}>
             <h2 className={styles.sectionTitle}>Your Projects</h2>
             <button 
-              onClick={() => router.push('/upload/developer')} 
+              onClick={() => router.push('/dashboard/developer/launch-project')} 
               className={styles.primaryBtn}
             >
               Launch New Project
@@ -174,7 +174,7 @@ export default function DeveloperDashboard() {
               <p className={styles.emptyTitle}>No projects launched yet</p>
               <p className={styles.emptyText}>Create your first project to reach investors and buyers across India</p>
               <button 
-                onClick={() => router.push('/upload/developer')}
+                onClick={() => router.push('/dashboard/developer/launch-project')}
                 className={styles.primaryBtn}
               >
                 Launch Your First Project

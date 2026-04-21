@@ -165,7 +165,7 @@ export default function LuxuryPage() {
   const stats = [
     { value: 500, suffix: '+',       label: 'Properties Listed'  },
     { value: 1000, suffix: '+',       label: 'Happy Buyers'        },
-    { value: 300,  prefix: '₹', suffix: 'Cr+', label: 'Deals Closed' },
+    { value: 100,  prefix: '₹', suffix: 'Cr+', label: 'Deals Closed' },
     { value: 100,  suffix: '+',       label: 'Verified Agents'     },
   ];
 

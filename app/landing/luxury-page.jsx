@@ -8,6 +8,7 @@ import SearchFilterSection from '@/components/SearchFilterSection';
 import FeaturedPropertiesSection from '@/components/FeaturedPropertiesSection';
 import CircularGallery from '@/components/CircularGallery';
 import FeaturesSection from '@/components/FeaturesSection';
+import NotariesSection from '@/components/NotariesSection';
 import styles from './luxury-page.module.css';
 
 /* ── Inline SVG Icons (Jugyah-style property feature icons) ── */
@@ -162,19 +163,19 @@ export default function LuxuryPage() {
 
   /* ── Data ── */
   const stats = [
-    { value: 15000, suffix: '+',       label: 'Properties Listed'  },
-    { value: 50000, suffix: '+',       label: 'Happy Buyers'        },
-    { value: 3000,  prefix: '₹', suffix: 'Cr+', label: 'Deals Closed' },
-    { value: 5000,  suffix: '+',       label: 'Verified Agents'     },
+    { value: 500, suffix: '+',       label: 'Properties Listed'  },
+    { value: 1000, suffix: '+',       label: 'Happy Buyers'        },
+    { value: 300,  prefix: '₹', suffix: 'Cr+', label: 'Deals Closed' },
+    { value: 100,  suffix: '+',       label: 'Verified Agents'     },
   ];
 
   const propertyTypes = [
-    { id: 'apartment',  label: 'Apartment',  count: '200+', },
+    { id: 'apartment',  label: 'Apartment',  count: '100+', },
     { id: 'villa',      label: 'Villa',       count: '10+',  },
-    { id: 'plot',       label: 'Plot',        count: '100+',  },
+    { id: 'plot',       label: 'Plot',        count: '50+',  },
     { id: 'penthouse',  label: 'Penthouse',   count: '50+',   },
-    { id: 'commercial', label: 'Commercial',  count: '300+',  },
-    { id: 'rowhouse',   label: 'Row House',   count: '556+',    },
+    { id: 'commercial', label: 'Commercial',  count: '100+',  },
+    { id: 'rowhouse',   label: 'Row House',   count: '100+',    },
   ];
 
   const marketTrends = [
@@ -731,6 +732,9 @@ export default function LuxuryPage() {
           </div>
         </div>
       </section>
+
+      {/* ══ NOTARIES SECTION ══ */}
+      <NotariesSection />
 
       {/* ══ CTA ══ */}
       <section className={styles.ctaSection}>

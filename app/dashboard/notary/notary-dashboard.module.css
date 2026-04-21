@@ -1,0 +1,443 @@
+/* ===== NOTARY DASHBOARD ===== */
+
+.container {
+  min-height: 100vh;
+  background: linear-gradient(to bottom, #f8fafc 0%, #ffffff 100%);
+  padding: 40px 20px;
+}
+
+/* ===== HEADER ===== */
+
+.header {
+  max-width: 1200px;
+  margin: 0 auto 40px;
+}
+
+.title {
+  font-size: 36px;
+  font-weight: 800;
+  color: #0f172a;
+  margin-bottom: 8px;
+}
+
+.subtitle {
+  font-size: 16px;
+  color: #64748b;
+  margin: 0;
+}
+
+/* ===== STATUS CARDS ===== */
+
+.statusCards {
+  max-width: 1200px;
+  margin: 0 auto 32px;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 16px;
+}
+
+.statusCard {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+  padding: 20px;
+  background: white;
+  border-radius: 12px;
+  border-left: 4px solid #e2e8f0;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+  transition: all 0.3s ease;
+}
+
+.statusCard:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.statusCard.complete,
+.statusCard.published,
+.statusCard.active {
+  border-left-color: #10b981;
+  background: #f0fdf4;
+}
+
+.statusCard.incomplete,
+.statusCard.unpublished,
+.statusCard.inactive {
+  border-left-color: #f59e0b;
+  background: #fffbeb;
+}
+
+.statusIcon {
+  font-size: 32px;
+  width: 50px;
+  height: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: white;
+  border-radius: 8px;
+  flex-shrink: 0;
+}
+
+.statusCard h3 {
+  font-size: 14px;
+  font-weight: 600;
+  color: #64748b;
+  margin: 0 0 4px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.statusCard p {
+  font-size: 18px;
+  font-weight: 800;
+  color: #1e293b;
+  margin: 0;
+}
+
+/* ===== PROFILE PREVIEW ===== */
+
+.profilePreview {
+  max-width: 1200px;
+  margin: 0 auto 32px;
+  padding: 28px;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.profilePreview h2 {
+  font-size: 20px;
+  font-weight: 700;
+  color: #0f172a;
+  margin-bottom: 20px;
+}
+
+.previewContent {
+  display: flex;
+  gap: 24px;
+  align-items: flex-start;
+}
+
+.previewPicture {
+  width: 120px;
+  height: 120px;
+  border-radius: 12px;
+  overflow: hidden;
+  flex-shrink: 0;
+  background: #f1f5f9;
+  border: 2px solid #e2e8f0;
+}
+
+.previewPicture img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.placeholderPic {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #0084ff 0%, #0066cc 100%);
+  color: white;
+  font-weight: 700;
+  font-size: 36px;
+}
+
+.previewInfo h3 {
+  font-size: 22px;
+  font-weight: 800;
+  color: #0f172a;
+  margin: 0 0 8px;
+}
+
+.previewInfo p {
+  font-size: 14px;
+  color: #64748b;
+  margin: 6px 0;
+}
+
+.city,
+.registration,
+.experience,
+.expertise {
+  font-weight: 500;
+  color: #1e293b;
+}
+
+/* ===== ACTIONS ===== */
+
+.actions {
+  max-width: 1200px;
+  margin: 0 auto 32px;
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.primaryBtn,
+.secondaryBtn,
+.publishBtn,
+.viewBtn {
+  display: inline-block;
+  padding: 14px 28px;
+  border-radius: 8px;
+  text-decoration: none;
+  font-weight: 700;
+  font-size: 15px;
+  cursor: pointer;
+  border: none;
+  transition: all 0.3s ease;
+}
+
+.primaryBtn {
+  background: linear-gradient(135deg, #0084ff 0%, #0066cc 100%);
+  color: white;
+}
+
+.primaryBtn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 16px rgba(0, 132, 255, 0.3);
+}
+
+.secondaryBtn {
+  background: white;
+  color: #0084ff;
+  border: 2px solid #0084ff;
+}
+
+.secondaryBtn:hover {
+  background: #f0f9ff;
+}
+
+/* ===== PUBLISH SECTION ===== */
+
+.publishSection {
+  max-width: 1200px;
+  margin: 0 auto 32px;
+  padding: 32px;
+  background: linear-gradient(135deg, #fef3c7 0%, #fbbf24 100%);
+  border-radius: 12px;
+  border: 2px solid #f59e0b;
+}
+
+.publishSection h2 {
+  font-size: 24px;
+  font-weight: 800;
+  color: #92400e;
+  margin: 0 0 8px;
+}
+
+.publishSection > p {
+  font-size: 15px;
+  color: #b45309;
+  margin-bottom: 24px;
+}
+
+.publishDetails {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.detail {
+  display: flex;
+  gap: 12px;
+  padding: 16px;
+  background: rgba(255, 255, 255, 0.7);
+  border-radius: 8px;
+}
+
+.detailIcon {
+  font-size: 28px;
+  flex-shrink: 0;
+}
+
+.detail h4 {
+  font-size: 14px;
+  font-weight: 700;
+  color: #1e293b;
+  margin: 0 0 4px;
+}
+
+.detail p {
+  font-size: 13px;
+  color: #64748b;
+  margin: 0;
+}
+
+.publishBtn {
+  display: inline-block;
+  background: white;
+  color: #f59e0b;
+}
+
+.publishBtn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 16px rgba(245, 158, 11, 0.3);
+}
+
+/* ===== PUBLISHED SECTION ===== */
+
+.publishedSection {
+  max-width: 1200px;
+  margin: 0 auto 32px;
+  padding: 32px;
+  background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
+  border-radius: 12px;
+  border: 2px solid #10b981;
+  text-align: center;
+}
+
+.publishedSection h2 {
+  font-size: 24px;
+  font-weight: 800;
+  color: #065f46;
+  margin: 0 0 8px;
+}
+
+.publishedSection p {
+  font-size: 15px;
+  color: #047857;
+  margin-bottom: 16px;
+}
+
+.viewBtn {
+  background: white;
+  color: #10b981;
+}
+
+.viewBtn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 16px rgba(16, 185, 129, 0.3);
+}
+
+/* ===== FAQ SECTION ===== */
+
+.faqSection {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 32px;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.faqSection h2 {
+  font-size: 24px;
+  font-weight: 800;
+  color: #0f172a;
+  margin-bottom: 24px;
+}
+
+.faqItems {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.faqItem {
+  padding: 16px;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.faqItem:hover {
+  background: #f8fafc;
+  border-color: #0084ff;
+}
+
+.faqItem summary {
+  font-weight: 700;
+  color: #1e293b;
+  list-style: none;
+}
+
+.faqItem summary::-webkit-details-marker {
+  display: none;
+}
+
+.faqItem summary::before {
+  content: '▶ ';
+  font-size: 12px;
+  margin-right: 8px;
+  display: inline-block;
+  transition: transform 0.2s ease;
+}
+
+.faqItem[open] summary::before {
+  transform: rotate(90deg);
+}
+
+.faqItem p {
+  margin: 12px 0 0 20px;
+  font-size: 14px;
+  color: #64748b;
+  line-height: 1.5;
+}
+
+/* ===== RESPONSIVE DESIGN ===== */
+
+@media (max-width: 768px) {
+  .container {
+    padding: 24px 16px;
+  }
+
+  .title {
+    font-size: 28px;
+  }
+
+  .statusCards {
+    grid-template-columns: 1fr;
+  }
+
+  .previewContent {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+
+  .previewPicture {
+    width: 100px;
+    height: 100px;
+  }
+
+  .actions {
+    flex-direction: column;
+  }
+
+  .primaryBtn,
+  .secondaryBtn {
+    width: 100%;
+  }
+
+  .publishSection,
+  .publishedSection,
+  .faqSection {
+    padding: 20px;
+  }
+
+  .publishDetails {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 480px) {
+  .container {
+    padding: 16px 12px;
+  }
+
+  .title {
+    font-size: 22px;
+  }
+
+  .publishBtn,
+  .viewBtn {
+    width: 100%;
+  }
+}

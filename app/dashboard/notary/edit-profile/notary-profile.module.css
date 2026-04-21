@@ -1,0 +1,301 @@
+/* ===== NOTARY PROFILE PAGE ===== */
+
+.container {
+  min-height: 100vh;
+  background: linear-gradient(to bottom, #f8fafc 0%, #ffffff 100%);
+  padding: 40px 20px;
+}
+
+.header {
+  max-width: 900px;
+  margin: 0 auto 40px;
+}
+
+.title {
+  font-size: 32px;
+  font-weight: 800;
+  color: #0f172a;
+  margin-bottom: 8px;
+}
+
+.subtitle {
+  font-size: 15px;
+  color: #64748b;
+}
+
+/* ===== FORM STYLES ===== */
+
+.form {
+  max-width: 900px;
+  margin: 0 auto;
+  background: white;
+  border-radius: 12px;
+  padding: 32px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+}
+
+.errorBanner {
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  color: #dc2626;
+  padding: 14px 16px;
+  border-radius: 8px;
+  margin-bottom: 24px;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.successBanner {
+  background: #dcfce7;
+  border: 1px solid #86efac;
+  color: #15803d;
+  padding: 14px 16px;
+  border-radius: 8px;
+  margin-bottom: 24px;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.section {
+  margin-bottom: 40px;
+  padding-bottom: 32px;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.section:last-of-type {
+  border-bottom: none;
+}
+
+.sectionTitle {
+  font-size: 18px;
+  font-weight: 700;
+  color: #0f172a;
+  margin-bottom: 20px;
+}
+
+/* ===== PROFILE PICTURE SECTION ===== */
+
+.profilePictureSection {
+  display: grid;
+  grid-template-columns: 150px 1fr;
+  gap: 24px;
+  align-items: center;
+}
+
+.previewWrapper {
+  width: 150px;
+  height: 150px;
+  border-radius: 12px;
+  overflow: hidden;
+  background: #f1f5f9;
+  border: 2px solid #e2e8f0;
+}
+
+.previewImage {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.uploadWrapper {
+  display: flex;
+  flex-direction: column;
+}
+
+.uploadLabel {
+  display: inline-block;
+  padding: 16px 20px;
+  background: linear-gradient(135deg, #0084ff 0%, #0066cc 100%);
+  color: white;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  text-align: center;
+  transition: all 0.3s ease;
+}
+
+.uploadLabel:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 16px rgba(0, 132, 255, 0.3);
+}
+
+.fileInput {
+  display: none;
+}
+
+.uploadText {
+  display: block;
+}
+
+.uploadHint {
+  font-size: 13px;
+  color: #64748b;
+  margin-top: 8px;
+}
+
+/* ===== FORM GROUP STYLES ===== */
+
+.formRow {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.formGroup {
+  margin-bottom: 20px;
+}
+
+.formGroup label {
+  display: block;
+  font-weight: 600;
+  color: #1e293b;
+  margin-bottom: 8px;
+  font-size: 14px;
+}
+
+.formGroup input,
+.formGroup select,
+.textarea {
+  width: 100%;
+  padding: 11px 14px;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  font-size: 14px;
+  font-family: inherit;
+  background: white;
+  color: #1e293b;
+  transition: all 0.2s ease;
+}
+
+.formGroup input:focus,
+.formGroup select:focus,
+.textarea:focus {
+  outline: none;
+  border-color: #0084ff;
+  box-shadow: 0 0 0 3px rgba(0, 132, 255, 0.1);
+}
+
+.disabledInput {
+  background: #f8fafc;
+  cursor: not-allowed;
+  color: #64748b;
+}
+
+.textarea {
+  resize: vertical;
+  min-height: 120px;
+}
+
+/* ===== FORM ACTIONS ===== */
+
+.formActions {
+  display: flex;
+  gap: 12px;
+  margin-top: 32px;
+  padding-top: 32px;
+  border-top: 1px solid #e2e8f0;
+}
+
+.saveBtn,
+.publishBtn {
+  padding: 12px 28px;
+  border: none;
+  border-radius: 8px;
+  font-weight: 700;
+  font-size: 15px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.saveBtn {
+  background: #f1f5f9;
+  color: #1e293b;
+  border: 1px solid #e2e8f0;
+  flex: 1;
+}
+
+.saveBtn:hover:not(:disabled) {
+  background: #e2e8f0;
+}
+
+.publishBtn {
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  color: white;
+  flex: 1;
+}
+
+.publishBtn:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 16px rgba(16, 185, 129, 0.3);
+}
+
+.saveBtn:disabled,
+.publishBtn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* ===== RESPONSIVE DESIGN ===== */
+
+@media (max-width: 768px) {
+  .container {
+    padding: 24px 16px;
+  }
+
+  .form {
+    padding: 20px;
+  }
+
+  .title {
+    font-size: 24px;
+  }
+
+  .formRow {
+    grid-template-columns: 1fr;
+  }
+
+  .profilePictureSection {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+
+  .previewWrapper {
+    width: 100%;
+    height: 200px;
+  }
+
+  .formActions {
+    flex-direction: column;
+  }
+
+  .saveBtn,
+  .publishBtn {
+    width: 100%;
+  }
+}
+
+@media (max-width: 480px) {
+  .container {
+    padding: 16px 12px;
+  }
+
+  .form {
+    padding: 16px;
+  }
+
+  .title {
+    font-size: 20px;
+  }
+
+  .sectionTitle {
+    font-size: 16px;
+  }
+
+  .formGroup input,
+  .formGroup select,
+  .textarea {
+    padding: 10px 12px;
+    font-size: 16px;
+  }
+}

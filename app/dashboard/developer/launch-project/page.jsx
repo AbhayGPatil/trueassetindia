@@ -171,14 +171,32 @@ export default function LaunchProjectPage() {
       for (const image of files.images) {
         try {
           const storagePath = `developer-projects/${user.uid}/${Date.now()}-${image.name}`;
-          console.log('📤 Uploading to:', storagePath);
+          console.log('📤 Image Upload Attempt:');
+          console.log('  Path:', storagePath);
+          console.log('  File:', image.name, `(${image.size} bytes)`);
+          console.log('  User UID:', user.uid);
+          console.log('  Current Auth:', {
+            uid: auth.currentUser?.uid,
+            email: auth.currentUser?.email,
+            isAnonymous: auth.currentUser?.isAnonymous,
+            metadata: auth.currentUser?.metadata
+          });
+          
           const imageRef = ref(storage, storagePath);
-          await uploadBytes(imageRef, image);
+          console.log('  Ref created:', imageRef.fullPath);
+          
+          const snapshot = await uploadBytes(imageRef, image);
+          console.log('  ✅ Upload successful:', snapshot.ref.fullPath);
+          
           const url = await getDownloadURL(imageRef);
           uploadedImageUrls.push(url);
-          console.log('✅ Image uploaded');
+          console.log('  ✅ Download URL obtained');
         } catch (imgError) {
-          console.error('Image upload error:', imgError);
+          console.error('❌ Image upload error:', {
+            code: imgError.code,
+            message: imgError.message,
+            name: imgError.name
+          });
           throw new Error(`Image upload failed: ${imgError.message}`);
         }
       }

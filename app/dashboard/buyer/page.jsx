@@ -171,8 +171,8 @@ export default function BuyerDashboard() {
   return (
     <div className={styles.container}>
       {/* BACK BUTTON */}
-      <button 
-        onClick={() => router.push('/')}
+      <button
+        onClick={() => { window.location.href = '/'; }}
         className={styles.backButton}
         title="Back to Home"
       >

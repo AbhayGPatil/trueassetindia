@@ -81,7 +81,7 @@ export default function DeveloperDashboard() {
   return (
     <div className={styles.container}>
       <div className={styles.topBar}>
-        <button onClick={() => router.push('/')} className={styles.logoBtn}>
+        <button onClick={() => { window.location.href = '/'; }} className={styles.logoBtn}>
           ← TrueAssets
         </button>
         <div className={styles.userMenu}>

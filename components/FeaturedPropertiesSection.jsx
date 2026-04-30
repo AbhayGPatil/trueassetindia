@@ -1,14 +1,16 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useContext } from 'react';
 import { useRouter } from 'next/navigation';
 import { collection, getDocs, query, where, limit, orderBy } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
+import { AuthContext } from '@/lib/AuthContext';
 import PropertyCard from './PropertyCard';
 import styles from './FeaturedPropertiesSection.module.css';
 
 export default function FeaturedPropertiesSection() {
   const router = useRouter();
+  const { user, loading: authLoading } = useContext(AuthContext);
   const [properties, setProperties] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -44,7 +46,11 @@ export default function FeaturedPropertiesSection() {
   }, []);
 
   const handleViewMore = () => {
-    router.push('/auth/login');
+    if (!authLoading && user) {
+      router.push('/listings');
+    } else {
+      router.push('/auth/login');
+    }
   };
 
   if (loading) {
@@ -86,7 +92,9 @@ export default function FeaturedPropertiesSection() {
                 <button onClick={handleViewMore} className={styles.viewMoreButton}>
                   View More Properties
                 </button>
-                <p className={styles.viewMoreText}>Sign in to see more properties and save your favorites</p>
+                {!authLoading && !user && (
+                  <p className={styles.viewMoreText}>Sign in to see more properties and save your favorites</p>
+                )}
               </div>
             )}
           </>

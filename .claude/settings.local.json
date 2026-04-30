@@ -3,7 +3,11 @@
     "allow": [
       "WebFetch(domain:jugyah.com)",
       "Bash(firebase use *)",
-      "Bash(firebase deploy *)"
+      "Bash(firebase deploy *)",
+      "Bash(npm run *)",
+      "Bash(ls .next/static/css/)",
+      "Bash(ls .next/static/)",
+      "Bash(xargs -I{} grep -o \"propertiesGrid[^}]*}\" {})"
     ]
   }
 }

@@ -438,7 +438,26 @@
   .stepsGrid { grid-template-columns: repeat(2, 1fr); }
   .featuresGrid { grid-template-columns: repeat(2, 1fr); }
 }
+
 @media (max-width: 768px) {
+  .navbar {
+    padding: 12px 0;
+  }
+
+  .navInner {
+    padding: 0 16px;
+    gap: 12px;
+  }
+
+  .logo {
+    font-size: 18px;
+  }
+
+  .backBtn {
+    padding: 6px 14px;
+    font-size: 12px;
+  }
+
   .calcGrid { grid-template-columns: 1fr; }
   .summaryRow { grid-template-columns: 1fr; gap: 12px; }
   .banksGrid { grid-template-columns: 1fr; }
@@ -448,9 +467,442 @@
   .ctaBtns { flex-direction: column; align-items: center; }
   .ctaPrimary, .ctaSecondary { width: 100%; justify-content: center; }
   .hero { padding: 48px 0 56px; }
+
+  .heroTitle {
+    font-size: clamp(28px, 4vw, 40px);
+  }
+
+  .heroSub {
+    font-size: 15px;
+  }
+
+  .calcTitle {
+    font-size: clamp(22px, 3vw, 32px);
+  }
+
+  .slidersCol {
+    padding: 28px 24px;
+  }
+
+  .emiCard {
+    padding: 28px 24px;
+  }
+
+  .emiValue {
+    font-size: 42px;
+  }
+
+  .slidersCol, .emiCard {
+    border-radius: 16px;
+  }
+
+  .sectionContainer {
+    padding: 0 16px;
+  }
+
+  .bankCard {
+    padding: 24px 20px;
+  }
+
+  .stepCard {
+    padding: 24px 20px;
+  }
+
+  .featureCard {
+    padding: 24px 20px;
+  }
 }
+
+@media (max-width: 640px) {
+  .navInner {
+    padding: 0 12px;
+  }
+
+  .logo {
+    font-size: 17px;
+  }
+
+  .backBtn {
+    padding: 5px 12px;
+    font-size: 11px;
+  }
+
+  .hero {
+    padding: 36px 0 40px;
+  }
+
+  .heroTitle {
+    font-size: clamp(24px, 3.5vw, 32px);
+  }
+
+  .heroBadge {
+    font-size: 10px;
+    padding: 5px 12px;
+    margin-bottom: 16px;
+  }
+
+  .heroSub {
+    font-size: 14px;
+    margin-bottom: 24px;
+  }
+
+  .heroBullet {
+    font-size: 13.5px;
+    gap: 8px;
+  }
+
+  .bulletCheck {
+    width: 20px;
+    height: 20px;
+  }
+
+  .calcTitle {
+    font-size: clamp(20px, 2.5vw, 26px);
+  }
+
+  .calcSub {
+    font-size: 14px;
+  }
+
+  .slidersCol {
+    padding: 24px 18px;
+    border-radius: 14px;
+  }
+
+  .emiCard {
+    padding: 24px 18px;
+    border-radius: 14px;
+  }
+
+  .emiValue {
+    font-size: 38px;
+  }
+
+  .emiLabel {
+    font-size: 11px;
+  }
+
+  .emiDetails {
+    font-size: 12px;
+    margin-bottom: 20px;
+  }
+
+  .sliderLabelRow span:first-child {
+    font-size: 13px;
+  }
+
+  .sliderVal {
+    font-size: 14px;
+  }
+
+  .summaryLabel {
+    font-size: 10px;
+  }
+
+  .summaryValue {
+    font-size: 16px;
+  }
+
+  .bankCard {
+    padding: 20px 18px;
+  }
+
+  .bankName {
+    font-size: 13px;
+  }
+
+  .bankRate {
+    font-size: 26px;
+  }
+
+  .bankRateLabel {
+    font-size: 10px;
+  }
+
+  .bankDetails {
+    font-size: 11px;
+  }
+
+  .bankApplyBtn {
+    font-size: 12px;
+    padding: 8px;
+  }
+
+  .stepCard {
+    padding: 20px 18px;
+  }
+
+  .stepNum {
+    font-size: 36px;
+  }
+
+  .stepIcon {
+    font-size: 28px;
+  }
+
+  .stepTitle {
+    font-size: 14px;
+  }
+
+  .stepDesc {
+    font-size: 12px;
+  }
+
+  .featureCard {
+    padding: 20px 18px;
+  }
+
+  .featureTitle {
+    font-size: 14px;
+  }
+
+  .featureDesc {
+    font-size: 12.5px;
+  }
+
+  .ctaCard {
+    padding: 32px 20px;
+    border-radius: 16px;
+  }
+
+  .ctaTitle {
+    font-size: clamp(20px, 2.5vw, 28px);
+    margin-bottom: 12px;
+  }
+
+  .ctaSub {
+    font-size: 14px;
+    margin-bottom: 28px;
+  }
+
+  .ctaPrimary, .ctaSecondary {
+    padding: 14px 24px;
+    font-size: 14px;
+  }
+
+  .sectionContainer {
+    padding: 0 14px;
+  }
+}
+
 @media (max-width: 480px) {
-  .emiValue { font-size: 36px; }
-  .slidersCol { padding: 24px 20px; }
-  .emiCard { padding: 24px 20px; }
+  .navInner {
+    padding: 0 10px;
+  }
+
+  .logo {
+    font-size: 16px;
+  }
+
+  .logoIndia {
+    font-size: 11px;
+  }
+
+  .backBtn {
+    padding: 5px 10px;
+    font-size: 11px;
+    white-space: nowrap;
+  }
+
+  .hero {
+    padding: 28px 0 32px;
+  }
+
+  .heroTitle {
+    font-size: 22px;
+  }
+
+  .heroBadge {
+    font-size: 9px;
+    padding: 4px 10px;
+    margin-bottom: 12px;
+  }
+
+  .heroSub {
+    font-size: 13px;
+    margin-bottom: 20px;
+    line-height: 1.5;
+  }
+
+  .heroBullets {
+    gap: 10px;
+  }
+
+  .heroBullet {
+    font-size: 12.5px;
+    gap: 8px;
+  }
+
+  .bulletCheck {
+    width: 18px;
+    height: 18px;
+    font-size: 10px;
+  }
+
+  .calcSection {
+    padding: 48px 0;
+  }
+
+  .calcTitle {
+    font-size: 20px;
+  }
+
+  .calcSub {
+    font-size: 13px;
+  }
+
+  .slidersCol {
+    padding: 20px 16px;
+    margin-bottom: 24px;
+  }
+
+  .emiCard {
+    padding: 20px 16px;
+  }
+
+  .emiValue {
+    font-size: 32px;
+    margin-bottom: 10px;
+  }
+
+  .emiLabel {
+    font-size: 10px;
+    margin-bottom: 8px;
+  }
+
+  .emiDetails {
+    font-size: 11px;
+    margin-bottom: 16px;
+  }
+
+  .donut {
+    width: 140px;
+    height: 140px;
+    margin-bottom: 12px;
+  }
+
+  .donutHole {
+    width: 85px;
+    height: 85px;
+  }
+
+  .donutLegend {
+    gap: 16px;
+  }
+
+  .donutItem {
+    font-size: 11px;
+  }
+
+  .applyBtn {
+    padding: 14px;
+    font-size: 14px;
+  }
+
+  .banksSection {
+    padding: 48px 0;
+  }
+
+  .bankCard {
+    padding: 18px 16px;
+  }
+
+  .bankName {
+    font-size: 12.5px;
+    margin-bottom: 8px;
+  }
+
+  .bankRate {
+    font-size: 24px;
+  }
+
+  .bankRateLabel {
+    font-size: 9px;
+  }
+
+  .bankDetails {
+    font-size: 10px;
+    margin-bottom: 14px;
+  }
+
+  .bankApplyBtn {
+    font-size: 11px;
+    padding: 7px;
+  }
+
+  .stepsSection {
+    padding: 48px 0;
+  }
+
+  .stepCard {
+    padding: 18px 16px;
+  }
+
+  .stepNum {
+    font-size: 32px;
+    margin-bottom: 6px;
+  }
+
+  .stepIcon {
+    font-size: 24px;
+    margin-bottom: 10px;
+  }
+
+  .stepTitle {
+    font-size: 13px;
+    margin-bottom: 6px;
+  }
+
+  .stepDesc {
+    font-size: 11.5px;
+  }
+
+  .featuresSection {
+    padding: 48px 0;
+  }
+
+  .featureCard {
+    padding: 18px 16px;
+  }
+
+  .featureTitle {
+    font-size: 13px;
+    margin-bottom: 6px;
+  }
+
+  .featureDesc {
+    font-size: 12px;
+  }
+
+  .ctaSection {
+    padding: 48px 0;
+  }
+
+  .ctaCard {
+    padding: 28px 18px;
+  }
+
+  .ctaTitle {
+    font-size: 20px;
+    margin-bottom: 10px;
+  }
+
+  .ctaSub {
+    font-size: 13px;
+    margin-bottom: 22px;
+  }
+
+  .ctaBtns {
+    gap: 12px;
+  }
+
+  .ctaPrimary, .ctaSecondary {
+    padding: 12px 20px;
+    font-size: 13px;
+    width: 100%;
+  }
+
+  .sectionContainer {
+    padding: 0 12px;
+  }
 }

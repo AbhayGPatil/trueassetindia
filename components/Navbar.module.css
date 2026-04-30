@@ -559,17 +559,18 @@
     }
 }
 
-@media (max-width: 600px) {
+@media (max-width: 640px) {
     .navContainer {
-        padding: 12px 12px;
+        padding: 10px 12px;
     }
 
     .logo {
-        font-size: 18px;
+        font-size: 17px;
     }
 
     .mobileToggle {
-        font-size: 20px;
+        font-size: 22px;
+        padding: 10px;
     }
 
     .megaMenuContent {
@@ -577,5 +578,73 @@
         grid-template-columns: 1fr;
         gap: 0;
         padding: 0;
+    }
+
+    .mobileMenu {
+        max-height: 85vh;
+    }
+
+    .mobileMenuItem {
+        padding: 14px 16px;
+        font-size: 14px;
+    }
+
+    .mobileLink {
+        padding: 14px 16px;
+        font-size: 14px;
+    }
+
+    .submenuCategory {
+        padding: 12px 16px;
+    }
+
+    .mobileSubmenu a {
+        font-size: 13px;
+        padding: 6px 0;
+    }
+}
+
+@media (max-width: 480px) {
+    .navContainer {
+        padding: 10px 10px;
+    }
+
+    .logo {
+        font-size: 16px;
+    }
+
+    .mobileToggle {
+        font-size: 20px;
+        padding: 8px;
+    }
+
+    .mobileAuthCard {
+        padding: 12px 16px;
+        gap: 10px;
+    }
+
+    .mobileAuthActions {
+        padding: 12px 16px;
+        gap: 8px;
+    }
+
+    .mobileAuthLink {
+        padding: 10px 12px;
+        font-size: 12px;
+    }
+
+    .mobileMenuItem {
+        padding: 12px 14px;
+        font-size: 13px;
+    }
+
+    .mobileLink {
+        padding: 12px 14px;
+        font-size: 13px;
+    }
+
+    .mobileLogoutBtn {
+        padding: 10px 12px;
+        font-size: 12px;
     }
 }

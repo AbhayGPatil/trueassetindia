@@ -8,6 +8,9 @@
   min-height: 100vh;
   background: #ffffff;
   font-family: 'DM Sans', 'Inter', sans-serif;
+  width: 100%;
+  max-width: 100vw;
+  overflow-x: hidden;
 }
 
 /* ─── Top Bar ─── */
@@ -451,7 +454,6 @@
   gap: 72px;
   align-items: center;
 }
-.rentImageCol {}
 .rentImgWrapper {
   position: relative;
   border-radius: 24px;
@@ -497,7 +499,6 @@
 }
 
 /* Rent – text column */
-.rentTextCol {}
 .rentTitle {
   font-size: clamp(28px, 3.5vw, 42px);
   font-weight: 700;
@@ -592,7 +593,6 @@
   gap: 72px;
   align-items: center;
 }
-.homeLoanText {}
 .homeLoanTitle {
   font-size: clamp(26px, 3vw, 38px);
   font-weight: 700;
@@ -882,6 +882,294 @@
 }
 .neighbourhoodCard:hover .neighbourhoodArrow { opacity: 1; }
 
+/* ─── MOBILE LAYOUT FIXES ─── */
+@media (max-width: 1024px) {
+  .topBarInner,
+  .navContent,
+  .sectionContainer {
+    padding-left: 16px;
+    padding-right: 16px;
+  }
+
+  .navLinks {
+    display: none;
+  }
+
+  .navActions {
+    gap: 8px;
+  }
+
+  .postFreeBtn,
+  .signInBtn,
+  .signUpBtn {
+    padding: 8px 14px;
+    font-size: 12px;
+  }
+
+  .profileCard {
+    gap: 10px;
+    padding: 6px 8px 6px 10px;
+  }
+}
+
+@media (max-width: 768px) {
+  .topBar {
+    padding: 6px 0;
+  }
+
+  .topBarInner {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+
+  .topBarLeft,
+  .topBarRight {
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+
+  .navbar {
+    top: 0;
+    padding: 10px 0;
+  }
+
+  .navContent {
+    gap: 12px;
+  }
+
+  .logoText {
+    font-size: 18px;
+  }
+
+  .logoTag {
+    display: none;
+  }
+
+  .postFreeBtn,
+  .signInBtn,
+  .signUpBtn {
+    padding: 7px 10px;
+    font-size: 11px;
+    border-radius: 8px;
+  }
+
+  .profileCard {
+    border-radius: 14px;
+    padding: 6px 8px;
+  }
+
+  .profileName {
+    max-width: 110px;
+    font-size: 12px;
+  }
+
+  .logoutBtn {
+    padding: 7px 10px;
+    font-size: 11px;
+  }
+
+  .sectionContainer {
+    padding-left: 14px;
+    padding-right: 14px;
+  }
+
+  .sectionHeading {
+    margin-bottom: 24px;
+  }
+
+  .sectionTitle,
+  .sectionTitleLight {
+    font-size: 24px;
+  }
+
+  .sectionSubtitle,
+  .sectionSubtitleLight {
+    font-size: 13px;
+  }
+
+  .statsStrip {
+    margin-top: 0;
+  }
+
+  .statsInner {
+    padding: 0 12px;
+  }
+
+  .statItem {
+    padding: 8px 10px;
+  }
+
+  .statValue {
+    font-size: 24px;
+  }
+
+  .statLabel {
+    font-size: 10px;
+  }
+
+  .browseTypeSection,
+  .rentSection,
+  .homeLoanSection,
+  .insightsSection,
+  .neighbourhoodSection,
+  .ownersSection {
+    padding: 44px 0;
+  }
+
+  .typesGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+  }
+
+  .typeCard {
+    padding: 18px 10px 16px;
+    border-radius: 14px;
+  }
+
+  .typeIcon {
+    font-size: 28px;
+  }
+
+  .typeLabel {
+    font-size: 12px;
+  }
+
+  .typeCount {
+    font-size: 10px;
+  }
+
+  .rentGrid,
+  .homeLoanGrid,
+  .ownersGrid {
+    grid-template-columns: 1fr;
+    gap: 24px;
+  }
+
+  .rentImg {
+    height: 320px;
+  }
+
+  .agentList,
+  .loanFeatures,
+  .ownersBtns,
+  .rentBtns {
+    gap: 10px;
+  }
+
+  .agentCard,
+  .ownerFeatureItem {
+    padding: 12px;
+  }
+
+  .ownerFeatureGrid {
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+
+  .trendsGrid {
+    display: flex;
+    gap: 12px;
+    overflow-x: auto;
+    padding-bottom: 8px;
+    scroll-snap-type: x mandatory;
+  }
+
+  .trendCard {
+    min-width: 240px;
+    scroll-snap-align: start;
+  }
+
+  .neighbourhoodGrid {
+    display: flex;
+    overflow-x: auto;
+    gap: 12px;
+    grid-template-columns: none;
+    grid-template-rows: none;
+    padding-bottom: 8px;
+    scroll-snap-type: x mandatory;
+  }
+
+  .neighbourhoodGrid > :first-child {
+    grid-column: auto;
+    grid-row: auto;
+  }
+
+  .neighbourhoodCard {
+    min-width: 240px;
+    height: 220px;
+    scroll-snap-align: start;
+    flex-shrink: 0;
+  }
+
+  .circularGallerySection {
+    padding-top: 44px;
+  }
+
+  .loginModal {
+    padding: 22px;
+    border-radius: 16px;
+  }
+}
+
+@media (max-width: 480px) {
+  .topBarLeft,
+  .topBarRight {
+    gap: 8px;
+    font-size: 11px;
+  }
+
+  .navActions {
+    gap: 6px;
+  }
+
+  .postFreeBtn,
+  .signInBtn,
+  .signUpBtn {
+    padding: 7px 9px;
+    font-size: 10px;
+  }
+
+  .typesGrid {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .typeCard {
+    padding: 16px 8px 14px;
+  }
+
+  .sectionTitle,
+  .sectionTitleLight {
+    font-size: 22px;
+  }
+
+  .statItem {
+    padding: 8px 6px;
+  }
+
+  .statValue {
+    font-size: 22px;
+  }
+
+  .ownerFeatureGrid {
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+
+  .ownerFeatureTitle {
+    font-size: 12px;
+  }
+
+  .ownerFeatureDesc {
+    font-size: 11px;
+  }
+
+  .trendCard,
+  .neighbourhoodCard {
+    min-width: 210px;
+  }
+}
+
 /* ─── Circular Gallery section ─── */
 .circularGallerySection {
   padding: 72px 0 0;
@@ -901,7 +1189,6 @@
   gap: 72px;
   align-items: center;
 }
-.ownersLeft {}
 .ownersTitle {
   font-size: clamp(26px, 3vw, 38px);
   font-weight: 700;
@@ -973,7 +1260,6 @@
 .learnMoreBtn:hover { border-color: #0084FF; color: #0084FF; }
 
 /* Owners image column */
-.ownersRight {}
 .ownersImgWrapper {
   position: relative;
   border-radius: 24px;
@@ -1273,7 +1559,6 @@
   grid-template-columns: 2fr 1fr 1fr 1.2fr;
   gap: 52px;
 }
-.footerBrand {}
 .footerLogo {
   font-size: 22px;
   font-weight: 800;
@@ -1304,7 +1589,6 @@
   text-transform: uppercase;
 }
 .socialBtn:hover { background: #0084FF; border-color: #0084FF; color: #fff; }
-.footerCol {}
 .footerColTitle { font-size: 11px; font-weight: 800; color: #fff; text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 20px; }
 .footerLink { display: block; font-size: 13.5px; color: rgba(255,255,255,0.45); text-decoration: none; margin-bottom: 12px; transition: color 0.18s; font-weight: 500; }
 .footerLink:hover { color: #0084FF; }

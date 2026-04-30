@@ -320,6 +320,10 @@
 }
 
 .propertyCard {
+  min-width: 0;
+}
+
+.propertyCard {
   background: #ffffff;
   border: 1px solid #ececef;
   border-radius: 10px;
@@ -529,7 +533,8 @@
   }
 
   .statsContainer {
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
   }
 
   .sectionTop {
@@ -544,6 +549,37 @@
 
   .propertiesGrid {
     grid-template-columns: 1fr;
+    gap: 14px;
+  }
+
+  .propertyCard {
+    margin: 0;
+  }
+
+  .propImageContainer {
+    height: 170px;
+  }
+
+  .propContent {
+    padding: 16px;
+  }
+
+  .propTitle {
+    font-size: 15px;
+  }
+
+  .propPrice {
+    font-size: 18px;
+  }
+
+  .interestedTable {
+    display: block;
+    overflow-x: auto;
+  }
+
+  .tableHead,
+  .tableRow {
+    min-width: 640px;
   }
 
   .tableHead,
@@ -563,5 +599,27 @@
 
   .emptyState {
     padding: 40px 16px;
+  }
+
+  .section {
+    padding: 16px;
+  }
+
+  .propertiesGrid {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  .propImageContainer {
+    height: 155px;
+  }
+
+  .propContent {
+    padding: 14px;
+  }
+
+  .tableHead,
+  .tableRow {
+    min-width: 560px;
   }
 }

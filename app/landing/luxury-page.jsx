@@ -269,6 +269,20 @@ export default function LuxuryPage() {
     }
   }, [authLoading, user]);
 
+  // hide the big search/filter hero on small screens (mobile)
+  const [isDesktop, setIsDesktop] = useState(true);
+  useEffect(() => {
+    const mq = window.matchMedia('(min-width:501px)');
+    const onChange = (e) => setIsDesktop(e.matches);
+    setIsDesktop(mq.matches);
+    if (mq.addEventListener) mq.addEventListener('change', onChange);
+    else mq.addListener(onChange);
+    return () => {
+      if (mq.removeEventListener) mq.removeEventListener('change', onChange);
+      else mq.removeListener(onChange);
+    };
+  }, []);
+
   const handleListingsRedirect = (target, event) => {
     if (event) event.preventDefault();
     if (!authLoading && !user) {
@@ -363,8 +377,10 @@ export default function LuxuryPage() {
         </div>
       </section>
 
-      {/* ══ SEARCH & FILTER — UNTOUCHED ══ */}
-      <SearchFilterSection onRequireLogin={() => setShowLoginPrompt(true)} />
+      {/* ══ SEARCH & FILTER — hidden on mobile to make flow seamless ══ */}
+      {isDesktop && (
+        <SearchFilterSection onRequireLogin={() => setShowLoginPrompt(true)} />
+      )}
 
       {/* ══ BROWSE BY TYPE ══ */}
       <section className={styles.browseTypeSection}>

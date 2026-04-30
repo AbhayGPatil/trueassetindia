@@ -61,7 +61,7 @@ export default function CinematicHero() {
     <div ref={containerRef} className={styles.cinemaHeroContainer}>
       <section className={styles.heroStage}>
         <div className={styles.heroContent}>
-          <p className={styles.eyebrow}>Supporting Local Mumbai Professionals</p>
+          <p className={styles.eyebrow}>The Asset You Won't Regret</p>
           <h1 className={styles.title}>TRUE ASSET INDIA</h1>
           <p className={styles.subtitle}>
             Discover premium properties, investment opportunities & professional networks

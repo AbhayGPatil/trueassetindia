@@ -1,15 +1,18 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useContext } from 'react';
 import { useRouter } from 'next/navigation';
 import { collection, getDocs, query, where, limit } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
+import { AuthContext } from '@/lib/AuthContext';
 import styles from './landing.module.css';
 
 export default function LandingPage() {
   const router = useRouter();
+  const { user, userProfile: profile, logout, loading: authLoading } = useContext(AuthContext);
   const [featuredProperties, setFeaturedProperties] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [showLoginPrompt, setShowLoginPrompt] = useState(false);
   const [searchInput, setSearchInput] = useState({
     location: '',
     propertyType: 'sell',
@@ -20,6 +23,12 @@ export default function LandingPage() {
   useEffect(() => {
     loadFeaturedProperties();
   }, []);
+
+  useEffect(() => {
+    if (!authLoading && user) {
+      setShowLoginPrompt(false);
+    }
+  }, [authLoading, user]);
 
   const loadFeaturedProperties = async () => {
     try {
@@ -60,6 +69,10 @@ export default function LandingPage() {
 
   const handleSearch = (e) => {
     e.preventDefault();
+    if (!authLoading && !user) {
+      setShowLoginPrompt(true);
+      return;
+    }
     // Redirect to listings with search params
     const params = new URLSearchParams();
     if (searchInput.location) params.append('location', searchInput.location);
@@ -71,8 +84,20 @@ export default function LandingPage() {
   };
 
   const handleViewMore = () => {
-    // Redirect to signup/login - they'll choose their role
-    router.push('/auth/signup');
+    if (!authLoading && !user) {
+      setShowLoginPrompt(true);
+      return;
+    }
+    router.push('/listings');
+  };
+
+  const handleLogout = async () => {
+    try {
+      await logout();
+      router.push('/');
+    } catch (error) {
+      console.error('Logout failed:', error);
+    }
   };
 
   const formatPrice = (price) => {
@@ -93,18 +118,34 @@ export default function LandingPage() {
             <h1>🏠 TrueAssets India</h1>
           </div>
           <div className={styles.nav_buttons}>
-            <button 
-              className={styles.btn_login}
-              onClick={() => router.push('/auth/login')}
-            >
-              Login
-            </button>
-            <button 
-              className={styles.btn_signup}
-              onClick={() => router.push('/auth/signup')}
-            >
-              Sign Up
-            </button>
+            {authLoading ? null : user ? (
+              <div className={styles.profileCard}>
+                <div className={styles.profileInfo}>
+                  <span className={styles.profileLabel}>Signed in as</span>
+                  <span className={styles.profileName}>
+                    {profile?.name || profile?.fullName || user.email || 'User'}
+                  </span>
+                </div>
+                <button className={styles.logoutBtn} onClick={handleLogout}>
+                  Logout
+                </button>
+              </div>
+            ) : (
+              <>
+                <button 
+                  className={styles.btn_login}
+                  onClick={() => router.push('/auth/login')}
+                >
+                  Login
+                </button>
+                <button 
+                  className={styles.btn_signup}
+                  onClick={() => router.push('/auth/signup')}
+                >
+                  Sign Up
+                </button>
+              </>
+            )}
           </div>
         </div>
       </header>
@@ -251,21 +292,36 @@ export default function LandingPage() {
             </div>
 
             {/* VIEW MORE BUTTON */}
-            <div className={styles.view_more_container}>
-              <button className={styles.view_more_btn} onClick={handleViewMore}>
-                ✨ Explore All Properties - Sign Up Now ✨
-              </button>
-            </div>
+              <div className={styles.view_more_container}>
+                <button className={styles.view_more_btn} onClick={handleViewMore}>
+                  ✨ Explore All Properties - Login Now ✨
+                </button>
+              </div>
           </>
         ) : (
           <div className={styles.no_properties}>
             <p>No featured properties available yet. Check back soon!</p>
             <button className={styles.view_more_btn} onClick={handleViewMore}>
-              Create Account & List Your Property
+              Login to continue
             </button>
           </div>
         )}
       </section>
+
+      {showLoginPrompt && (
+        <div className={styles.loginOverlay} role="dialog" aria-modal="true">
+          <div className={styles.loginModal}>
+            <h2 className={styles.loginTitle}>Please Login to explore further and find your dream home</h2>
+            <p className={styles.loginText}>Sign in to browse full listings, save favorites, and get personalized matches.</p>
+            <button
+              className={styles.loginButton}
+              onClick={() => router.push('/auth/login')}
+            >
+              Login
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* WHY CHOOSE US SECTION */}
       <section className={styles.why_section}>

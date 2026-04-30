@@ -89,13 +89,38 @@ function CheckoutContent() {
       const { orderId, currency } = await orderResponse.json();
       console.log('✅ [CHECKOUT] Order created:', { orderId, currency });
 
-      // Load Razorpay script
-      const script = document.createElement('script');
-      script.src = 'https://checkout.razorpay.com/v1/checkout.js';
-      script.async = true;
-      document.body.appendChild(script);
+      // Load Razorpay script with proper error handling
+      const loadRazorpayScript = () => {
+        return new Promise((resolve, reject) => {
+          if (window.Razorpay) {
+            resolve(true);
+            return;
+          }
 
-      script.onload = () => {
+          const existingScript = document.querySelector('script[src="https://checkout.razorpay.com/v1/checkout.js"]');
+          if (existingScript) {
+            existingScript.addEventListener('load', () => resolve(true), { once: true });
+            existingScript.addEventListener('error', () => reject(new Error('Failed to load Razorpay SDK')), { once: true });
+            return;
+          }
+
+          const script = document.createElement('script');
+          script.src = 'https://checkout.razorpay.com/v1/checkout.js';
+          script.async = true;
+          script.onload = () => resolve(true);
+          script.onerror = () => reject(new Error('Failed to load Razorpay SDK'));
+          document.body.appendChild(script);
+        });
+      };
+
+      try {
+        await loadRazorpayScript();
+        console.log('✅ [CHECKOUT] Razorpay SDK loaded successfully');
+
+        if (!window.Razorpay) {
+          throw new Error('Razorpay SDK failed to initialize');
+        }
+
         const options = {
           key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID,
           order_id: orderId,
@@ -167,7 +192,11 @@ function CheckoutContent() {
 
         const razorpay = new window.Razorpay(options);
         razorpay.open();
-      };
+      } catch (scriptError) {
+        console.error('❌ [CHECKOUT] Failed to load Razorpay SDK:', scriptError.message);
+        setError('Failed to load payment gateway. Please try again.');
+        setLoading(false);
+      }
     } catch (err) {
       console.error('❌ [CHECKOUT] Error in handlePayment:', {
         message: err.message,

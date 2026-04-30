@@ -74,6 +74,7 @@ export default function KeyHighlightsSelector({ value, onChange }) {
         {Object.entries(highlightsData).map(([key, category]) => (
           <button
             key={key}
+            type="button"
             className={`${styles.categoryTab} ${activeCategory === key ? styles.active : ''}`}
             onClick={() => setActiveCategory(key)}
           >
@@ -87,6 +88,7 @@ export default function KeyHighlightsSelector({ value, onChange }) {
         {highlightsData[activeCategory]?.highlights.map(highlight => (
           <button
             key={highlight.id}
+            type="button"
             className={`${styles.highlightButton} ${selectedHighlights.includes(highlight.id) ? styles.selected : ''}`}
             onClick={() => handleToggleHighlight(highlight.id)}
           >

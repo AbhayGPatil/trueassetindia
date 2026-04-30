@@ -180,6 +180,12 @@
   overflow-y: auto;
 }
 
+.noResults {
+  padding: 10px 14px;
+  font-size: 12px;
+  color: #94a3b8;
+}
+
 .dropdownItem {
   padding: 10px 14px;
   background: none;
@@ -313,6 +319,24 @@
 /* Spacer */
 .spacer {
   flex: 1;
+}
+
+.clearFiltersBtn {
+  background: #fff;
+  color: #dc2626;
+  border: 1px solid #fecaca;
+  border-radius: 10px;
+  padding: 10px 14px;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.clearFiltersBtn:hover {
+  background: #fef2f2;
+  border-color: #dc2626;
 }
 
 /* All Filters Button - Subtle Settings Icon */

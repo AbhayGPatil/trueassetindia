@@ -1,13 +1,15 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useContext } from 'react';
 import { useRouter } from 'next/navigation';
+import { AuthContext } from '@/lib/AuthContext';
 import BlurText from './BlurText';
 import BorderGlow from './BorderGlow';
 import styles from './SearchFilterSection.module.css';
 
-export default function SearchFilterSection() {
+export default function SearchFilterSection({ onRequireLogin }) {
   const router = useRouter();
+  const { user, loading: authLoading } = useContext(AuthContext);
   const [selectedType, setSelectedType] = useState('buy');
   const [searchQuery, setSearchQuery] = useState('');
 
@@ -22,6 +24,12 @@ export default function SearchFilterSection() {
 
   const handleSearch = (e) => {
     e.preventDefault();
+    if (!authLoading && !user) {
+      if (onRequireLogin) {
+        onRequireLogin();
+      }
+      return;
+    }
     if (searchQuery.trim()) {
       const params = new URLSearchParams();
       params.set('search', searchQuery.trim());

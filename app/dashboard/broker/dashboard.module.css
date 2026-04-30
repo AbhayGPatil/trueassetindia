@@ -356,7 +356,7 @@
 
 .tableHead {
   display: grid;
-  grid-template-columns: 2fr 2fr 1fr;
+  grid-template-columns: 2fr 1fr 2fr 1fr;
   gap: 0;
   background: var(--neutral-50);
   border-bottom: 1px solid #ececef;
@@ -370,13 +370,14 @@
 
 .tableCol1,
 .tableCol2,
-.tableCol3 {
+.tableCol3,
+.tableCol4 {
   padding: 16px 20px;
 }
 
 .tableRow {
   display: grid;
-  grid-template-columns: 2fr 2fr 1fr;
+  grid-template-columns: 2fr 1fr 2fr 1fr;
   gap: 0;
   border-bottom: 1px solid #ececef;
   align-items: center;
@@ -393,7 +394,8 @@
 
 .tableCol1,
 .tableCol2,
-.tableCol3 {
+.tableCol3,
+.tableCol4 {
   padding: 16px 20px;
   font-size: 14px;
   color: #2d3138;

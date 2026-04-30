@@ -4,6 +4,7 @@ import { motion } from 'framer-motion';
 import styles from './PropertyCard.module.css';
 import { formatIndianCurrency } from '@/lib/utils/formatCurrency';
 import { SaleIcon, RentIcon, AuctionIcon, LocationIcon } from './Icons/RealEstateIcons';
+import { getAmenityIcon } from '@/components/AmenityIcons';
 
 export default function PropertyCard({ property, showViewMore = false, onViewMoreClick }) {
     const [imageError, setImageError] = useState(false);
@@ -18,8 +19,8 @@ export default function PropertyCard({ property, showViewMore = false, onViewMor
     const beds = property.bedrooms || property.beds || 0;
     const baths = property.bathrooms || property.baths || 0;
     const sqft = property.area || property.superArea || 0;
-    const type = property.type === 'rent' ? 'For Rent' : 'For Sale';
-    const isBankAuction = property.bankAuction || false;
+    const isBankAuction = property.bankAuction || property.type === 'auction' || false;
+    const type = isBankAuction ? 'Bank Auction' : (property.type === 'rent' ? 'For Rent' : 'For Sale');
     const amenities = property.amenities || [];
 
     const handleViewClick = (e) => {
@@ -55,6 +56,8 @@ export default function PropertyCard({ property, showViewMore = false, onViewMor
                     <span className={styles.typeBadge}>
                         {type === 'For Rent' ? (
                             <><RentIcon size={12} /> For Rent</>
+                        ) : type === 'Bank Auction' ? (
+                            <><AuctionIcon size={12} /> Bank Auction</>
                         ) : (
                             <><SaleIcon size={12} /> For Sale</>
                         )}
@@ -95,11 +98,15 @@ export default function PropertyCard({ property, showViewMore = false, onViewMor
                 {/* AMENITIES PILLS */}
                 {amenities.length > 0 && (
                     <div className={styles.amenitiesPills}>
-                        {amenities.slice(0, 3).map((amenity, idx) => (
-                            <span key={idx} className={styles.pill}>
-                                {amenity}
-                            </span>
-                        ))}
+                        {amenities.slice(0, 3).map((amenity, idx) => {
+                            const AmenityIcon = getAmenityIcon(amenity);
+                            return (
+                                <span key={idx} className={styles.amenityPill}>
+                                    {AmenityIcon && <span className={styles.amenityPillIcon}><AmenityIcon /></span>}
+                                    <span>{amenity}</span>
+                                </span>
+                            );
+                        })}
                         {amenities.length > 3 && (
                             <span className={styles.pillMore}>
                                 +{amenities.length - 3}

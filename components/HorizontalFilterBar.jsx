@@ -6,8 +6,9 @@ import styles from './HorizontalFilterBar.module.css';
 import { MapPin, IndianRupee, Bed, ChevronDown, Sliders } from 'lucide-react';
 
 export default function HorizontalFilterBar({ onAllFiltersClick, citiesList = [] }) {
-  const { filters, setLocationFilter, setPriceFilter, setBhkRange } = useFilterStore();
+  const { filters, setLocationFilter, setPriceFilter, setBhkRange, clearFilters } = useFilterStore();
   const [openDropdown, setOpenDropdown] = useState(null);
+  const [locationQuery, setLocationQuery] = useState('');
 
   // Price quick-select options
   const priceQuickSelects = [
@@ -20,6 +21,16 @@ export default function HorizontalFilterBar({ onAllFiltersClick, citiesList = []
 
   const handleLocationSelect = (city) => {
     setLocationFilter({ city });
+    setOpenDropdown(null);
+    setLocationQuery('');
+  };
+
+  const handleLocationInputKey = (event) => {
+    if (event.key !== 'Enter') return;
+    event.preventDefault();
+    const query = locationQuery.trim();
+    if (!query) return;
+    setLocationFilter({ city: query });
     setOpenDropdown(null);
   };
 
@@ -36,12 +47,60 @@ export default function HorizontalFilterBar({ onAllFiltersClick, citiesList = []
   const isLocationActive = filters.location.city;
   const isPriceActive = filters.price.min > 0 || filters.price.max < 100000000;
   const isBhkActive = filters.bhkRange.min === filters.bhkRange.max && filters.bhkRange.min > 0;
+  const hasAnyFilter =
+    isLocationActive ||
+    isPriceActive ||
+    isBhkActive ||
+    !!filters.propertyCategory ||
+    filters.propertyType.length > 0 ||
+    filters.furnishing.length > 0 ||
+    filters.amenities.length > 0 ||
+    filters.bankAuction;
 
   const formatPrice = (price) => {
     if (price >= 10000000) return `₹${(price / 10000000).toFixed(1)}Cr`;
     if (price >= 100000) return `₹${(price / 100000).toFixed(0)}L`;
     return `₹${price}`;
   };
+
+  const allLocations = [
+    // Central South (Prestige Zone)
+    'Girgaon', 'Walkeshwar', 'Malabar Hill', 'Altamount Road', 'Breach Candy',
+    'Kemps Corner', 'Cuffe Parade', 'Colaba', 'Nariman Point',
+    // South Central
+    'Worli Sea Face', 'Prabhadevi', 'Tardeo', 'Gamdevi', 'Peddar Road',
+    // South Central & Harbour Area
+    'Wadala East (Bhakti Park)', 'Five Gardens (Matunga)', 'Hindu Colony',
+    'Parel Village', 'Mazgaon',
+    // Western Suburbs - High-Growth & Celebrity Belt
+    'Pali Hill', 'Carter Road', 'Juhu Scheme', 'JVPD Scheme', 'Lokhandwala Complex',
+    'Versova', 'Seven Bungalows', 'Four Bungalows', 'Yari Road', 'Kandarpada',
+    'Gorai', 'Shanti Ashram', 'IC Colony', 'Shimpoli', 'Charkop', 'Poisar',
+    'Thakur Village', 'Thakur Complex', 'Mindspace', 'Oshiwara', 'Royal Palms',
+    'Gokuldham', 'Sher-e-Punjab',
+    // Central Suburbs & North
+    'Powai', 'Chandivali', 'Panchshrishti', 'Hiranandani Gardens', 'Everest Nagar',
+    'Nehru Nagar', 'Kannamwar Nagar', 'Garodia Nagar', 'Pant Nagar', 'Jolly Board',
+    // Navi Mumbai & Eastern Fringe
+    'Palm Beach Road', 'Seawoods', 'Koparkhairane', 'Kharghar Hills', 'Ulwe',
+    'Dronagiri', 'Taloja', 'Kamothe',
+    // Western Line Stations
+    'Borivali', 'Kandivali', 'Malad', 'Jogeshwari', 'Andheri', 'Vile Parle',
+    'Bombay Central', 'Marine Lines',
+    // Central Line Stations
+    'Kasara', 'Asangaon', 'Titwala', 'Dombivli', 'Thane', 'Mumbra', 'Kalyan',
+    // Harbour Line Stations
+    'Panvel', 'Khopoli', 'Byculla', 'Fort',
+    // Optional list passed in
+    ...citiesList,
+  ];
+
+  const normalizedQuery = locationQuery.trim().toLowerCase();
+  const filteredLocations = allLocations.filter((location) =>
+    normalizedQuery.length < 1
+      ? true
+      : location.toLowerCase().includes(normalizedQuery)
+  );
 
   return (
     <div className={styles.horizontalBar}>
@@ -68,38 +127,13 @@ export default function HorizontalFilterBar({ onAllFiltersClick, citiesList = []
                 type="text"
                 placeholder="Search city..."
                 className={styles.searchInput}
+                value={locationQuery}
+                onChange={(e) => setLocationQuery(e.target.value)}
+                onKeyDown={handleLocationInputKey}
                 onFocus={(e) => e.target.select()}
               />
               <div className={styles.dropdownContent}>
-                {[
-                  // Central South (Prestige Zone)
-                  'Girgaon', 'Walkeshwar', 'Malabar Hill', 'Altamount Road', 'Breach Candy', 
-                  'Kemps Corner', 'Cuffe Parade', 'Colaba', 'Nariman Point',
-                  // South Central
-                  'Worli Sea Face', 'Prabhadevi', 'Tardeo', 'Gamdevi', 'Peddar Road',
-                  // South Central & Harbour Area
-                  'Wadala East (Bhakti Park)', 'Five Gardens (Matunga)', 'Hindu Colony', 
-                  'Parel Village', 'Mazgaon',
-                  // Western Suburbs - High-Growth & Celebrity Belt
-                  'Pali Hill', 'Carter Road', 'Juhu Scheme', 'JVPD Scheme', 'Lokhandwala Complex',
-                  'Versova', 'Seven Bungalows', 'Four Bungalows', 'Yari Road', 'Kandarpada',
-                  'Gorai', 'Shanti Ashram', 'IC Colony', 'Shimpoli', 'Charkop', 'Poisar',
-                  'Thakur Village', 'Thakur Complex', 'Mindspace', 'Oshiwara', 'Royal Palms',
-                  'Gokuldham', 'Sher-e-Punjab',
-                  // Central Suburbs & North
-                  'Powai', 'Chandivali', 'Panchshrishti', 'Hiranandani Gardens', 'Everest Nagar',
-                  'Nehru Nagar', 'Kannamwar Nagar', 'Garodia Nagar', 'Pant Nagar', 'Jolly Board',
-                  // Navi Mumbai & Eastern Fringe
-                  'Palm Beach Road', 'Seawoods', 'Koparkhairane', 'Kharghar Hills', 'Ulwe',
-                  'Dronagiri', 'Taloja', 'Kamothe',
-                  // Western Line Stations
-                  'Borivali', 'Kandivali', 'Malad', 'Jogeshwari', 'Andheri', 'Vile Parle', 
-                  'Bombay Central', 'Marine Lines',
-                  // Central Line Stations
-                  'Kasara', 'Asangaon', 'Titwala', 'Dombivli', 'Thane', 'Mumbra', 'Kalyan',
-                  // Harbour Line Stations
-                  'Panvel', 'Khopoli', 'Byculla', 'Fort'
-                ].map((location) => (
+                {filteredLocations.map((location) => (
                   <button
                     key={location}
                     className={`${styles.dropdownItem} ${filters.location.city === location ? styles.selected : ''}`}
@@ -108,6 +142,9 @@ export default function HorizontalFilterBar({ onAllFiltersClick, citiesList = []
                     {location}
                   </button>
                 ))}
+                {filteredLocations.length === 0 && (
+                  <div className={styles.noResults}>No locations found</div>
+                )}
               </div>
             </div>
           )}
@@ -212,6 +249,20 @@ export default function HorizontalFilterBar({ onAllFiltersClick, citiesList = []
 
         {/* Spacer */}
         <div className={styles.spacer} />
+
+        {hasAnyFilter && (
+          <button
+            className={styles.clearFiltersBtn}
+            onClick={() => {
+              clearFilters();
+              setOpenDropdown(null);
+              setLocationQuery('');
+            }}
+            title="Clear all filters"
+          >
+            Clear Filters
+          </button>
+        )}
 
         {/* All Filters / Settings Button */}
         <button className={styles.allFiltersBtn} onClick={onAllFiltersClick} title="Advanced Filters">

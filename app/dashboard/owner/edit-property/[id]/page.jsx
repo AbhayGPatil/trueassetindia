@@ -1,101 +1,119 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useParams } from 'next/navigation';
 import { useAuth } from '@/lib/AuthContext';
 import { 
-  canUploadProperty, 
-  incrementFreeUploads 
-} from '@/lib/uploadLimitUtils';
-import { 
   collection, 
-  addDoc, 
-  serverTimestamp 
+  query,
+  where,
+  getDocs,
+  updateDoc,
+  doc,
+  serverTimestamp
 } from 'firebase/firestore';
 import { 
   ref, 
   uploadBytes, 
-  getDownloadURL 
+  getDownloadURL
 } from 'firebase/storage';
 import { db, storage } from '@/lib/firebase';
 import AmenitiesSelector from '@/components/AmenitiesSelector';
 import KeyHighlightsSelector from '@/components/KeyHighlightsSelector';
-import styles from './add-property.module.css';
+import styles from '../../add-property/add-property.module.css';
 
-export default function AddPropertyPage() {
+export default function EditPropertyPage() {
   const router = useRouter();
+  const params = useParams();
   const { user, userProfile, loading } = useAuth();
-  
+  const propertyId = params?.id;
+
   const [formData, setFormData] = useState({
     title: '',
     description: '',
     location: '',
     price: '',
     type: 'sell',
-    propertyCategory: '', // apartment, villa, plot, penthouse, commercial, rowhouse
+    propertyCategory: '',
     bedrooms: '',
     bathrooms: '',
     area: '',
-    layout: '', // 1BHK, 2BHK, etc
-    superArea: '', // Super area in sq ft
-    superAreaUnit: 'sqft', // sqft or sqm
-    furnishing: '', // SEMI, FULL, NOT
-    facing: '', // EAST, WEST, SOUTH, NORTH, NE, NW, SE, SW
+    layout: '',
+    superArea: '',
+    superAreaUnit: 'sqft',
+    furnishing: '',
+    facing: '',
     amenities: '',
-    keyHighlights: '', // comma separated
+    keyHighlights: '',
   });
 
+  const [property, setProperty] = useState(null);
   const [images, setImages] = useState([]);
+  const [newImages, setNewImages] = useState([]);
   const [videos, setVideos] = useState([]);
+  const [newVideos, setNewVideos] = useState([]);
   const [uploading, setUploading] = useState(false);
+  const [loadingProperty, setLoadingProperty] = useState(true);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
-  const [uploadLimit, setUploadLimit] = useState(null);
 
+  // Load property data
   useEffect(() => {
-    if (!loading && user) {
-      checkUploadLimit();
-    }
-  }, [user, loading]);
-
-  const checkUploadLimit = async () => {
-    try {
-      const canUpload = await canUploadProperty(user.uid);
-      setUploadLimit(canUpload);
-      if (!canUpload) {
-        setError('❌ You have reached your upload limit. Please upgrade your subscription.');
+    const fetchProperty = async () => {
+      if (!propertyId || !user) {
+        setLoadingProperty(false);
+        return;
       }
-    } catch (err) {
-      console.error('Error checking upload limit:', err);
-      setError('Error checking upload limit: ' + err.message);
-    }
-  };
 
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({
-      ...prev,
-      [name]: value
-    }));
-  };
+      try {
+        const propertiesQuery = query(
+          collection(db, 'properties'),
+          where('uploadedBy', '==', user.uid)
+        );
+        const snapshot = await getDocs(propertiesQuery);
+        const foundProperty = snapshot.docs.find(doc => doc.id === propertyId);
 
-  const handleImageChange = (e) => {
-    const files = Array.from(e.target.files);
-    setImages(prev => [...prev, ...files]);
-  };
+        if (!foundProperty) {
+          setError('❌ Property not found or you do not have permission to edit it');
+          setLoadingProperty(false);
+          return;
+        }
 
-  const handleVideoChange = (e) => {
-    const files = Array.from(e.target.files);
-    setVideos(prev => [...prev, ...files]);
-  };
+        const propertyData = foundProperty.data();
+        setProperty({ ...propertyData, id: propertyId });
+        
+        // Populate form with existing data
+        setFormData({
+          title: propertyData.title || '',
+          description: propertyData.description || '',
+          location: propertyData.location || '',
+          price: propertyData.price || '',
+          type: propertyData.type || 'sell',
+          propertyCategory: propertyData.propertyCategory || '',
+          bedrooms: propertyData.bedrooms?.toString() || '',
+          bathrooms: propertyData.bathrooms?.toString() || '',
+          area: propertyData.area?.toString() || '',
+          layout: propertyData.layout || '',
+          superArea: propertyData.superArea?.toString() || '',
+          superAreaUnit: propertyData.superAreaUnit || 'sqft',
+          furnishing: propertyData.furnishing || '',
+          facing: propertyData.facing || '',
+          amenities: propertyData.amenities?.join(', ') || '',
+          keyHighlights: propertyData.keyHighlights?.join(', ') || '',
+        });
+        
+        setImages(propertyData.images || []);
+        setVideos(propertyData.videos || []);
+      } catch (err) {
+        console.error('Error fetching property:', err);
+        setError('❌ Error loading property: ' + err.message);
+      } finally {
+        setLoadingProperty(false);
+      }
+    };
 
-  const removeImage = (index) => {
-    setImages(prev => prev.filter((_, i) => i !== index));
-  };
-
-  const removeVideo = (index) => {
-    setVideos(prev => prev.filter((_, i) => i !== index));
-  };
+    fetchProperty();
+  }, [propertyId, user]);
 
   const validateForm = () => {
     const missingFields = [];
@@ -106,7 +124,7 @@ export default function AddPropertyPage() {
     if (!formData.type) missingFields.push('Property Type (Buy/Rent)');
     if (!formData.propertyCategory) missingFields.push('Property Category');
     
-    if (images.length === 0) missingFields.push('At least 1 Image');
+    if (images.length === 0 && newImages.length === 0) missingFields.push('At least 1 Image');
     
     if (missingFields.length > 0) {
       setError(`⚠️ Missing required fields:\n• ${missingFields.join('\n• ')}`);
@@ -117,23 +135,50 @@ export default function AddPropertyPage() {
     return true;
   };
 
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [name]: value
+    }));
+  };
+
+  const handleNewImageChange = (e) => {
+    const files = Array.from(e.target.files);
+    setNewImages(prev => [...prev, ...files]);
+  };
+
+  const handleNewVideoChange = (e) => {
+    const files = Array.from(e.target.files);
+    setNewVideos(prev => [...prev, ...files]);
+  };
+
+  const removeExistingImage = (index) => {
+    setImages(prev => prev.filter((_, i) => i !== index));
+  };
+
+  const removeExistingVideo = (index) => {
+    setVideos(prev => prev.filter((_, i) => i !== index));
+  };
+
+  const removeNewImage = (index) => {
+    setNewImages(prev => prev.filter((_, i) => i !== index));
+  };
+
+  const removeNewVideo = (index) => {
+    setNewVideos(prev => prev.filter((_, i) => i !== index));
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     
-    if (!user) {
-      setError('User not authenticated');
+    if (!user || !propertyId) {
+      setError('❌ User or property not found');
       return;
     }
 
     // Validate form first
     if (!validateForm()) {
-      return;
-    }
-
-    // Check upload limit
-    const canUpload = await canUploadProperty(user.uid);
-    if (!canUpload) {
-      setError('❌ You have reached your upload limit. Please upgrade your subscription.');
       return;
     }
 
@@ -146,33 +191,33 @@ export default function AddPropertyPage() {
     setError('');
 
     try {
-      // Upload images to Firebase Storage
-      const imageUrls = [];
-      
-      for (let i = 0; i < images.length; i++) {
-        const file = images[i];
+      // Upload new images
+      const newImageUrls = [];
+      for (let i = 0; i < newImages.length; i++) {
+        const file = newImages[i];
         const storageRef = ref(storage, `properties/${user.uid}/${Date.now()}_img_${i}_${file.name}`);
         await uploadBytes(storageRef, file);
         const downloadURL = await getDownloadURL(storageRef);
-        imageUrls.push(downloadURL);
+        newImageUrls.push(downloadURL);
       }
 
-      // Upload videos to Firebase Storage
-      const videoUrls = [];
-      
-      for (let i = 0; i < videos.length; i++) {
-        const file = videos[i];
+      // Upload new videos
+      const newVideoUrls = [];
+      for (let i = 0; i < newVideos.length; i++) {
+        const file = newVideos[i];
         const storageRef = ref(storage, `properties/${user.uid}/${Date.now()}_vid_${i}_${file.name}`);
         await uploadBytes(storageRef, file);
         const downloadURL = await getDownloadURL(storageRef);
-        videoUrls.push(downloadURL);
+        newVideoUrls.push(downloadURL);
       }
 
-      console.log('✅ Images uploaded:', imageUrls);
-      console.log('✅ Videos uploaded:', videoUrls);
+      // Combine old and new images/videos
+      const allImages = [...images, ...newImageUrls];
+      const allVideos = [...videos, ...newVideoUrls];
 
-      // Save property to Firestore
-      const propertyData = {
+      // Update property in Firestore
+      const propertyRef = doc(db, 'properties', propertyId);
+      await updateDoc(propertyRef, {
         title: formData.title,
         description: formData.description,
         location: formData.location,
@@ -190,70 +235,39 @@ export default function AddPropertyPage() {
         bankAuction: formData.type === 'auction',
         amenities: formData.amenities ? formData.amenities.split(',').map(a => a.trim()).filter(a => a) : [],
         keyHighlights: formData.keyHighlights ? formData.keyHighlights.split(',').map(h => h.trim()).filter(h => h) : [],
-        images: imageUrls,
-        videos: videoUrls,
-        uploadedBy: user.uid,
-        ownerName: userProfile?.name || 'Unknown',
-        ownerEmail: user.email,
-        ownerPhone: userProfile?.whatsapp || userProfile?.phone || '',
-        createdAt: serverTimestamp(),
-        status: 'active',
-        isVerified: userProfile?.isVerified || false,
-      };
-
-      // Add document to Firestore
-      const docRef = await addDoc(
-        collection(db, 'properties'),
-        propertyData
-      );
-
-      console.log('✅ Property created with ID:', docRef.id);
-
-      // Increment free uploads if applicable
-      await incrementFreeUploads(user.uid);
-
-      setSuccess('✅ Property uploaded successfully!');
-      setFormData({
-        title: '',
-        description: '',
-        location: '',
-        price: '',
-        type: 'sell',
-        propertyCategory: '',
-        bedrooms: '',
-        bathrooms: '',
-        area: '',
-        layout: '',
-        superArea: '',
-        superAreaUnit: 'sqft',
-        furnishing: '',
-        facing: '',
-        amenities: '',
-        keyHighlights: '',
+        images: allImages,
+        videos: allVideos,
+        updatedAt: serverTimestamp(),
       });
-      setImages([]);
-      setVideos([]);
 
+      console.log('✅ Property updated with ID:', propertyId);
+
+      setSuccess('✅ Property updated successfully!');
+      
       // Redirect to dashboard after 2 seconds
       setTimeout(() => {
-        router.push('/dashboard/broker');
+        router.push('/dashboard/owner');
       }, 2000);
 
     } catch (err) {
-      console.error('❌ Error uploading property:', err);
-      setError('❌ Error uploading property: ' + err.message);
+      console.error('❌ Error updating property:', err);
+      setError('❌ Error updating property: ' + err.message);
       setUploading(false);
     }
   };
 
-  if (loading) return <div className={styles.container}>Loading...</div>;
+  if (loading || loadingProperty) {
+    return <div className={styles.container}>Loading...</div>;
+  }
 
-  if (!user) return <div className={styles.container}>Please log in first</div>;
+  if (!user || !property) {
+    return <div className={styles.container}>Please log in first or property not found</div>;
+  }
 
   return (
     <div className={styles.container}>
       <div className={styles.form_wrapper}>
-        <h1 className={styles.title}>Add New Property</h1>
+        <h1>Edit Property</h1>
 
         {error && (
           <div className={styles.error}>
@@ -267,18 +281,6 @@ export default function AddPropertyPage() {
           </div>
         )}
 
-        {uploadLimit === false && (
-          <div className={styles.limit_warning}>
-            <p>📦 You have reached your upload limit for free users.</p>
-            <button 
-              onClick={() => router.push('/subscription')}
-              style={{ marginTop: '10px' }}
-            >
-              Upgrade Subscription
-            </button>
-          </div>
-        )}
-
         <form onSubmit={handleSubmit}>
           <div className={styles.form_group}>
             <label htmlFor="title">Property Title *</label>
@@ -288,7 +290,7 @@ export default function AddPropertyPage() {
               name="title"
               value={formData.title}
               onChange={handleInputChange}
-              placeholder="e.g., Commercial Space in Business District"
+              placeholder="e.g., Beautiful 3BHK Apartment in Mumbai"
               required
             />
           </div>
@@ -314,7 +316,7 @@ export default function AddPropertyPage() {
                 name="location"
                 value={formData.location}
                 onChange={handleInputChange}
-                placeholder="e.g., Delhi, India"
+                placeholder="e.g., Mumbai, Maharashtra"
                 required
               />
             </div>
@@ -363,7 +365,7 @@ export default function AddPropertyPage() {
                 name="price"
                 value={formData.price}
                 onChange={handleInputChange}
-                placeholder="e.g., 2500000"
+                placeholder="e.g., 5000000"
                 required
               />
             </div>
@@ -376,7 +378,7 @@ export default function AddPropertyPage() {
                 name="area"
                 value={formData.area}
                 onChange={handleInputChange}
-                placeholder="e.g., 2000"
+                placeholder="e.g., 1500"
               />
             </div>
           </div>
@@ -390,7 +392,7 @@ export default function AddPropertyPage() {
                 name="bedrooms"
                 value={formData.bedrooms}
                 onChange={handleInputChange}
-                placeholder="e.g., 5"
+                placeholder="e.g., 3"
               />
             </div>
 
@@ -402,7 +404,7 @@ export default function AddPropertyPage() {
                 name="bathrooms"
                 value={formData.bathrooms}
                 onChange={handleInputChange}
-                placeholder="e.g., 3"
+                placeholder="e.g., 2"
               />
             </div>
 
@@ -421,35 +423,34 @@ export default function AddPropertyPage() {
                 <option value="3BHK">3 BHK</option>
                 <option value="4BHK">4 BHK</option>
                 <option value="5BHK">5 BHK</option>
-                <option value="Studio">Studio</option>
-                <option value="Penthouse">Penthouse</option>
               </select>
             </div>
           </div>
 
           <div className={styles.form_row}>
             <div className={styles.form_group}>
-              <label htmlFor="superArea">Super Area</label>
-              <div style={{ display: 'flex', gap: '10px' }}>
-                <input
-                  type="number"
-                  id="superArea"
-                  name="superArea"
-                  value={formData.superArea}
-                  onChange={handleInputChange}
-                  placeholder="e.g., 1800"
-                  style={{ flex: 1 }}
-                />
-                <select
-                  name="superAreaUnit"
-                  value={formData.superAreaUnit}
-                  onChange={handleInputChange}
-                  style={{ width: '100px' }}
-                >
-                  <option value="sqft">Sq.ft</option>
-                  <option value="sqm">Sq.m</option>
-                </select>
-              </div>
+              <label htmlFor="superArea">Super Area (sq ft)</label>
+              <input
+                type="number"
+                id="superArea"
+                name="superArea"
+                value={formData.superArea}
+                onChange={handleInputChange}
+                placeholder="e.g., 2000"
+              />
+            </div>
+
+            <div className={styles.form_group}>
+              <label htmlFor="superAreaUnit">Unit</label>
+              <select
+                id="superAreaUnit"
+                name="superAreaUnit"
+                value={formData.superAreaUnit}
+                onChange={handleInputChange}
+              >
+                <option value="sqft">Sq. Ft.</option>
+                <option value="sqm">Sq. M.</option>
+              </select>
             </div>
 
             <div className={styles.form_group}>
@@ -489,17 +490,6 @@ export default function AddPropertyPage() {
           </div>
 
           <div className={styles.form_group}>
-            <label>Key Highlights - Why Choose This Property?</label>
-            <KeyHighlightsSelector
-              value={formData.keyHighlights}
-              onChange={(value) => setFormData(prev => ({
-                ...prev,
-                keyHighlights: value
-              }))}
-            />
-          </div>
-
-          <div className={styles.form_group}>
             <label>Amenities</label>
             <AmenitiesSelector
               value={formData.amenities}
@@ -511,40 +501,61 @@ export default function AddPropertyPage() {
           </div>
 
           <div className={styles.form_group}>
-            <label htmlFor="images">Upload Images *</label>
-            <input
-              type="file"
-              id="images"
-              multiple
-              accept="image/*"
-              onChange={handleImageChange}
-              required
+            <label>Key Highlights - Why Choose This Property?</label>
+            <KeyHighlightsSelector
+              value={formData.keyHighlights}
+              onChange={(value) => setFormData(prev => ({
+                ...prev,
+                keyHighlights: value
+              }))}
             />
-            <p className={styles.help_text}>Max 5 images recommended</p>
           </div>
 
           <div className={styles.form_group}>
-            <label htmlFor="videos">Upload Videos (Optional)</label>
-            <input
-              type="file"
-              id="videos"
-              multiple
-              accept="video/*"
-              onChange={handleVideoChange}
-            />
-            <p className={styles.help_text}>Supported: MP4, WebM, OGG (Max 100MB per video)</p>
+            <label htmlFor="images">Existing Images</label>
+            {images.length > 0 && (
+              <div className={styles.image_preview}>
+                <h3>Current Images ({images.length})</h3>
+                <div className={styles.image_grid}>
+                  {images.map((url, index) => (
+                    <div key={index} className={styles.image_item}>
+                      <img src={url} alt={`Property ${index + 1}`} />
+                      <button
+                        type="button"
+                        onClick={() => removeExistingImage(index)}
+                        className={styles.remove_btn}
+                      >
+                        Remove
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
 
-          {images.length > 0 && (
+          <div className={styles.form_group}>
+            <label htmlFor="newImages">Add New Images (Optional)</label>
+            <input
+              type="file"
+              id="newImages"
+              multiple
+              accept="image/*"
+              onChange={handleNewImageChange}
+            />
+            <p className={styles.help_text}>Add more images to your listing</p>
+          </div>
+
+          {newImages.length > 0 && (
             <div className={styles.image_preview}>
-              <h3>Selected Images ({images.length})</h3>
+              <h3>New Images ({newImages.length})</h3>
               <div className={styles.image_grid}>
-                {images.map((file, index) => (
+                {newImages.map((file, index) => (
                   <div key={index} className={styles.image_item}>
                     <p>{file.name}</p>
                     <button
                       type="button"
-                      onClick={() => removeImage(index)}
+                      onClick={() => removeNewImage(index)}
                       className={styles.remove_btn}
                     >
                       Remove
@@ -555,16 +566,28 @@ export default function AddPropertyPage() {
             </div>
           )}
 
-          {videos.length > 0 && (
+          <div className={styles.form_group}>
+            <label htmlFor="newVideos">Add New Videos (Optional)</label>
+            <input
+              type="file"
+              id="newVideos"
+              multiple
+              accept="video/*"
+              onChange={handleNewVideoChange}
+            />
+            <p className={styles.help_text}>Add videos to showcase your property</p>
+          </div>
+
+          {newVideos.length > 0 && (
             <div className={styles.image_preview}>
-              <h3>Selected Videos ({videos.length})</h3>
+              <h3>New Videos ({newVideos.length})</h3>
               <div className={styles.image_grid}>
-                {videos.map((file, index) => (
+                {newVideos.map((file, index) => (
                   <div key={index} className={styles.image_item}>
-                    <p>🎥 {file.name}</p>
+                    <p>{file.name}</p>
                     <button
                       type="button"
-                      onClick={() => removeVideo(index)}
+                      onClick={() => removeNewVideo(index)}
                       className={styles.remove_btn}
                     >
                       Remove
@@ -577,15 +600,15 @@ export default function AddPropertyPage() {
 
           <button
             type="submit"
-            disabled={uploading || uploadLimit === false}
+            disabled={uploading}
             className={styles.submit_btn}
           >
-            {uploading ? '⏳ Uploading...' : '📤 Upload Property'}
+            {uploading ? '⏳ Updating...' : '💾 Update Property'}
           </button>
         </form>
 
         <button
-          onClick={() => router.push('/dashboard/broker')}
+          onClick={() => router.push('/dashboard/owner')}
           className={styles.back_btn}
         >
           ← Back to Dashboard

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useContext } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion, useInView } from 'framer-motion';
 import CinematicHero from '@/components/CinematicHero';
@@ -9,6 +9,7 @@ import FeaturedPropertiesSection from '@/components/FeaturedPropertiesSection';
 import CircularGallery from '@/components/CircularGallery';
 import FeaturesSection from '@/components/FeaturesSection';
 import NotariesSection from '@/components/NotariesSection';
+import { AuthContext } from '@/lib/AuthContext';
 import styles from './luxury-page.module.css';
 
 /* ── Inline SVG Icons (Jugyah-style property feature icons) ── */
@@ -158,8 +159,10 @@ function MiniEMICalc() {
 ══════════════════════════════════════════════════ */
 export default function LuxuryPage() {
   const router = useRouter();
+  const { user, userProfile: profile, logout, loading: authLoading } = useContext(AuthContext);
   const [navScrolled, setNavScrolled] = useState(false);
   const [expandedCity, setExpandedCity] = useState('Mumbai');
+  const [showLoginPrompt, setShowLoginPrompt] = useState(false);
 
   /* ── Data ── */
   const stats = [
@@ -260,6 +263,30 @@ export default function LuxuryPage() {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
+  useEffect(() => {
+    if (!authLoading && user) {
+      setShowLoginPrompt(false);
+    }
+  }, [authLoading, user]);
+
+  const handleListingsRedirect = (target, event) => {
+    if (event) event.preventDefault();
+    if (!authLoading && !user) {
+      setShowLoginPrompt(true);
+      return;
+    }
+    router.push(target);
+  };
+
+  const handleLogout = async () => {
+    try {
+      await logout();
+      router.push('/');
+    } catch (error) {
+      console.error('Logout failed:', error);
+    }
+  };
+
   return (
     <div className={styles.container}>
 
@@ -295,8 +322,22 @@ export default function LuxuryPage() {
 
           <div className={styles.navActions}>
             <button onClick={() => router.push('/auth/signup/owner')} className={styles.postFreeBtn}>+ Post FREE</button>
-            <button onClick={() => router.push('/auth/login')} className={styles.signInBtn}>Sign In</button>
-            <button onClick={() => router.push('/auth/signup/buyer')} className={styles.signUpBtn}>Register</button>
+            {authLoading ? null : user ? (
+              <div className={styles.profileCard}>
+                <div className={styles.profileInfo}>
+                  <span className={styles.profileLabel}>Signed in as</span>
+                  <span className={styles.profileName}>
+                    {profile?.name || profile?.fullName || user.email || 'User'}
+                  </span>
+                </div>
+                <button className={styles.logoutBtn} onClick={handleLogout}>Logout</button>
+              </div>
+            ) : (
+              <>
+                <button onClick={() => router.push('/auth/login')} className={styles.signInBtn}>Sign In</button>
+                <button onClick={() => router.push('/auth/signup/buyer')} className={styles.signUpBtn}>Register</button>
+              </>
+            )}
           </div>
         </div>
       </nav>
@@ -323,7 +364,7 @@ export default function LuxuryPage() {
       </section>
 
       {/* ══ SEARCH & FILTER — UNTOUCHED ══ */}
-      <SearchFilterSection />
+      <SearchFilterSection onRequireLogin={() => setShowLoginPrompt(true)} />
 
       {/* ══ BROWSE BY TYPE ══ */}
       <section className={styles.browseTypeSection}>
@@ -335,7 +376,7 @@ export default function LuxuryPage() {
           <div className={styles.typesGrid}>
             {propertyTypes.map((type, i) => (
               <motion.button key={type.id} className={styles.typeCard}
-                onClick={() => router.push(`/listings?type=${type.id}`)}
+                onClick={() => handleListingsRedirect(`/listings?type=${type.id}`)}
                 initial={{ opacity: 0, y: 30 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 transition={{ delay: i * 0.08, duration: 0.4 }}
@@ -421,7 +462,7 @@ export default function LuxuryPage() {
               </div>
 
               <div className={styles.rentBtns}>
-                <button className={styles.rentBtnPrimary} onClick={() => router.push('/listings?type=rent')}>
+                <button className={styles.rentBtnPrimary} onClick={() => handleListingsRedirect('/listings?type=rent')}>
                   Browse Rentals <ArrowIcon />
                 </button>
                 <button className={styles.rentBtnSecondary} onClick={() => router.push('/auth/signup/buyer')}>
@@ -494,7 +535,7 @@ export default function LuxuryPage() {
               <span className={styles.sectionEyebrow}>Live Market Data</span>
               <h2 className={styles.sectionTitle}>Price Trends — What&apos;s Moving</h2>
             </div>
-            <button className={styles.viewAllTrends} onClick={() => router.push('/listings')}>
+            <button className={styles.viewAllTrends} onClick={() => handleListingsRedirect('/listings')}>
               View All Trends →
             </button>
           </div>
@@ -505,7 +546,7 @@ export default function LuxuryPage() {
                 whileInView={{ opacity: 1, y: 0 }}
                 transition={{ delay: i * 0.1, duration: 0.5 }}
                 viewport={{ once: true }}
-                onClick={() => router.push(`/listings?location=${trend.area}`)}>
+                onClick={() => handleListingsRedirect(`/listings?location=${trend.area}`)}>
                 <div className={styles.trendTop}>
                   <div>
                     <div className={styles.trendArea}>{trend.area}</div>
@@ -553,7 +594,7 @@ export default function LuxuryPage() {
                 transition={{ delay: i * 0.07, duration: 0.45 }}
                 viewport={{ once: true }}
                 whileHover={{ scale: 1.02 }}
-                onClick={() => router.push(`/listings?location=${n.name}`)}>
+                onClick={() => handleListingsRedirect(`/listings?location=${n.name}`)}>
                 <img src={n.image} alt={n.name} className={styles.neighbourhoodImg} />
                 <div className={styles.neighbourhoodOverlay} />
                 <div className={styles.neighbourhoodInfo}>
@@ -683,14 +724,14 @@ export default function LuxuryPage() {
               transition={{ duration: 0.3 }}>
               {locationsByCity[expandedCity].slice(0, 16).map((location) => (
                 <button key={location} className={styles.locationLinkClean}
-                  onClick={() => router.push(`/listings?location=${encodeURIComponent(location)}`)}>
+                  onClick={() => handleListingsRedirect(`/listings?location=${encodeURIComponent(location)}`)}>
                   <span className={styles.locationNameClean}>{location}</span>
                   <span className={styles.locationCountClean}>(Luxury Homes)</span>
                 </button>
               ))}
               {locationsByCity[expandedCity].length > 16 && (
                 <button className={styles.showMoreLinkClean}
-                  onClick={() => router.push(`/listings?city=${encodeURIComponent(expandedCity)}`)}>
+                  onClick={() => handleListingsRedirect(`/listings?city=${encodeURIComponent(expandedCity)}`)}>
                   <span>+{locationsByCity[expandedCity].length - 16} more locations</span>
                   <span className={styles.arrow}>→</span>
                 </button>
@@ -748,7 +789,7 @@ export default function LuxuryPage() {
             <h2 className={styles.ctaTitle}>Ready to Find Your Perfect Home?</h2>
             <p className={styles.ctaSubtitle}>15,000+ verified properties across Mumbai, Thane &amp; Navi Mumbai</p>
             <div className={styles.ctaBtns}>
-              <button onClick={() => router.push('/listings')} className={styles.ctaBtnPrimary}>Explore Properties →</button>
+              <button onClick={() => handleListingsRedirect('/listings')} className={styles.ctaBtnPrimary}>Explore Properties →</button>
               <button onClick={() => router.push('/auth/signup/owner')} className={styles.ctaBtnOutline}>Post Property FREE</button>
             </div>
           </motion.div>
@@ -773,7 +814,6 @@ export default function LuxuryPage() {
                   sellers and brokers since 2024.
                 </p>
                 <div className={styles.footerContact}>
-                  <div className={styles.footerContactItem}><PhoneIcon /> +91 98765 43210</div>
                   <div className={styles.footerContactItem}>✉ contact@trueassets.in</div>
                 </div>
                 <div className={styles.footerSocials}>
@@ -786,23 +826,23 @@ export default function LuxuryPage() {
               {/* Explore column */}
               <div className={styles.footerCol}>
                 <h5 className={styles.footerColTitle}>Explore</h5>
-                <a href="/listings" className={styles.footerLink}>Buy Property</a>
-                <a href="/listings?type=rent" className={styles.footerLink}>Rent Property</a>
-                <a href="/listings" className={styles.footerLink}>New Projects</a>
-                <a href="/listings" className={styles.footerLink}>Commercial</a>
-                <a href="/listings" className={styles.footerLink}>Bank Auction</a>
+                <a href="/listings" className={styles.footerLink} onClick={(e) => handleListingsRedirect('/listings', e)}>Buy Property</a>
+                <a href="/listings?type=rent" className={styles.footerLink} onClick={(e) => handleListingsRedirect('/listings?type=rent', e)}>Rent Property</a>
+                <a href="/listings" className={styles.footerLink} onClick={(e) => handleListingsRedirect('/listings', e)}>New Projects</a>
+                <a href="/listings" className={styles.footerLink} onClick={(e) => handleListingsRedirect('/listings', e)}>Commercial</a>
+                <a href="/listings" className={styles.footerLink} onClick={(e) => handleListingsRedirect('/listings', e)}>Bank Auction</a>
                 <a href="/home-loan" className={styles.footerLink}>Home Loans</a>
               </div>
 
               {/* Cities column */}
               <div className={styles.footerCol}>
                 <h5 className={styles.footerColTitle}>Top Cities</h5>
-                <a href="/listings?city=Mumbai" className={styles.footerLink}>Mumbai</a>
-                <a href="/listings?city=Thane" className={styles.footerLink}>Thane</a>
-                <a href="/listings?city=Navi%20Mumbai" className={styles.footerLink}>Navi Mumbai</a>
-                <a href="/listings?location=Worli" className={styles.footerLink}>Worli</a>
-                <a href="/listings?location=BKC" className={styles.footerLink}>BKC</a>
-                <a href="/listings?location=Bandra" className={styles.footerLink}>Bandra</a>
+                <a href="/listings?city=Mumbai" className={styles.footerLink} onClick={(e) => handleListingsRedirect('/listings?city=Mumbai', e)}>Mumbai</a>
+                <a href="/listings?city=Thane" className={styles.footerLink} onClick={(e) => handleListingsRedirect('/listings?city=Thane', e)}>Thane</a>
+                <a href="/listings?city=Navi%20Mumbai" className={styles.footerLink} onClick={(e) => handleListingsRedirect('/listings?city=Navi%20Mumbai', e)}>Navi Mumbai</a>
+                <a href="/listings?location=Worli" className={styles.footerLink} onClick={(e) => handleListingsRedirect('/listings?location=Worli', e)}>Worli</a>
+                <a href="/listings?location=BKC" className={styles.footerLink} onClick={(e) => handleListingsRedirect('/listings?location=BKC', e)}>BKC</a>
+                <a href="/listings?location=Bandra" className={styles.footerLink} onClick={(e) => handleListingsRedirect('/listings?location=Bandra', e)}>Bandra</a>
               </div>
 
               {/* Company column */}
@@ -837,6 +877,21 @@ export default function LuxuryPage() {
           </div>
         </div>
       </footer>
+
+      {showLoginPrompt && (
+        <div className={styles.loginOverlay} role="dialog" aria-modal="true">
+          <div className={styles.loginModal}>
+            <h2 className={styles.loginTitle}>Please Login to explore further and find your dream home</h2>
+            <p className={styles.loginText}>Sign in to view all listings, save favorites, and unlock personalized recommendations.</p>
+            <button
+              className={styles.loginButton}
+              onClick={() => router.push('/auth/login')}
+            >
+              Login
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

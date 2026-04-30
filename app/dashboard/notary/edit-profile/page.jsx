@@ -67,6 +67,34 @@ export default function NotaryProfilePage() {
     }));
   };
 
+  const loadRazorpayScript = () => {
+    return new Promise((resolve, reject) => {
+      if (typeof window === 'undefined') {
+        reject(new Error('Razorpay can only be loaded in the browser'));
+        return;
+      }
+
+      if (window.Razorpay) {
+        resolve(true);
+        return;
+      }
+
+      const existingScript = document.querySelector('script[src="https://checkout.razorpay.com/v1/checkout.js"]');
+      if (existingScript) {
+        existingScript.addEventListener('load', () => resolve(true), { once: true });
+        existingScript.addEventListener('error', () => reject(new Error('Failed to load Razorpay SDK')), { once: true });
+        return;
+      }
+
+      const script = document.createElement('script');
+      script.src = 'https://checkout.razorpay.com/v1/checkout.js';
+      script.async = true;
+      script.onload = () => resolve(true);
+      script.onerror = () => reject(new Error('Failed to load Razorpay SDK'));
+      document.body.appendChild(script);
+    });
+  };
+
   const handleImageChange = (e) => {
     const file = e.target.files[0];
     if (file) {
@@ -100,7 +128,7 @@ export default function NotaryProfilePage() {
 
       // Upload profile picture if changed
       if (profileImage) {
-        const imageRef = ref(storage, `notary-profiles/${user.uid}/profile-pic`);
+        const imageRef = ref(storage, `notary-profiles/${user.uid}/profile-picture`);
         await uploadBytes(imageRef, profileImage);
         profilePictureUrl = await getDownloadURL(imageRef);
       }
@@ -152,6 +180,8 @@ export default function NotaryProfilePage() {
 
       const order = await response.json();
 
+      await loadRazorpayScript();
+
       const options = {
         key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID,
         amount: order.amount,
@@ -166,6 +196,10 @@ export default function NotaryProfilePage() {
           contact: profileData.phone,
         },
       };
+
+      if (typeof window.Razorpay !== 'function') {
+        throw new Error('Razorpay checkout is not available yet');
+      }
 
       const rzp = new window.Razorpay(options);
       rzp.open();
@@ -434,8 +468,7 @@ export default function NotaryProfilePage() {
         </div>
       </form>
 
-      {/* Razorpay Script */}
-      <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+      {/* Razorpay Script loaded dynamically before payment */}
     </div>
   );
 }

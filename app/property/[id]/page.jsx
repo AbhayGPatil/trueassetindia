@@ -57,7 +57,7 @@ export default function PropertyDetailPage() {
   const params = useParams();
   const router = useRouter();
   const propertyId = params.id;
-  const { user, loading } = useAuth();
+  const { user, userProfile: profile, loading } = useAuth();
 
   const [property, setProperty] = useState(null);
   const [loading_page, setLoadingPage] = useState(true);
@@ -131,6 +131,7 @@ export default function PropertyDetailPage() {
         propertyTitle: property.title,
         visitorId: user.uid,
         visitorEmail: user.email,
+        visitorPhone: profile?.phone || profile?.whatsapp || '',
         ownerId: property.uploadedBy,
         markedAt: serverTimestamp(),
       });

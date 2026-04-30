@@ -44,7 +44,7 @@ export default function FeaturedPropertiesSection() {
   }, []);
 
   const handleViewMore = () => {
-    router.push('/auth/signup');
+    router.push('/auth/login');
   };
 
   if (loading) {

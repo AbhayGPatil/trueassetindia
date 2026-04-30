@@ -4,7 +4,7 @@ import { useContext, useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { AuthContext } from '@/lib/AuthContext';
 import { db } from '@/lib/firebase';
-import { query, where, collection, getDocs } from 'firebase/firestore';
+import { query, where, collection, getDocs, deleteDoc, doc } from 'firebase/firestore';
 import styles from './developer.module.css';
 
 export default function DeveloperDashboard() {
@@ -53,6 +53,19 @@ export default function DeveloperDashboard() {
 
     fetchData();
   }, [user]);
+
+  const handleDeleteProject = async (projectId) => {
+    const shouldDelete = window.confirm('Delete this project? This cannot be undone.');
+    if (!shouldDelete) return;
+
+    try {
+      await deleteDoc(doc(db, 'properties', projectId));
+      setProjects(prev => prev.filter(project => project.id !== projectId));
+    } catch (err) {
+      console.error('Error deleting project:', err);
+      window.alert('Unable to delete project: ' + err.message);
+    }
+  };
 
   if (loading || dashboardLoading) {
     return <div className={styles.loading}>Loading dashboard...</div>;
@@ -201,15 +214,33 @@ export default function DeveloperDashboard() {
                     <p className={styles.propLocation}>{prop.location}</p>
                     <div className={styles.propMeta}>
                       <span className={styles.propType}>
-                        {prop.type === 'sell' ? 'Sale' : 'Rental'}
+                        {prop.type === 'auction' || prop.bankAuction ? 'Bank Auction' : (prop.type === 'sell' ? 'Sale' : 'Rental')}
                       </span>
                     </div>
-                    <button 
-                      onClick={() => router.push(`/property/${prop.id}`)}
-                      className={styles.viewLink}
-                    >
-                      View Details →
-                    </button>
+                    <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
+                      <button 
+                        onClick={() => router.push(`/property/${prop.id}`)}
+                        className={styles.viewLink}
+                        style={{ flex: 1 }}
+                      >
+                        View Details →
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => handleDeleteProject(prop.id)}
+                        style={{
+                          padding: '8px 16px',
+                          backgroundColor: '#ef4444',
+                          color: 'white',
+                          border: 'none',
+                          borderRadius: '6px',
+                          cursor: 'pointer',
+                          flex: 1,
+                        }}
+                      >
+                        🗑 Delete
+                      </button>
+                    </div>
                   </div>
                 </div>
               ))}
@@ -238,14 +269,16 @@ export default function DeveloperDashboard() {
             <div className={styles.interestedTable}>
               <div className={styles.tableHead}>
                 <div className={styles.tableCol1}>Investor Email</div>
-                <div className={styles.tableCol2}>Project</div>
-                <div className={styles.tableCol3}>Date</div>
+                <div className={styles.tableCol2}>Phone</div>
+                <div className={styles.tableCol3}>Project</div>
+                <div className={styles.tableCol4}>Date</div>
               </div>
               {interestedClients.map(client => (
                 <div key={client.id} className={styles.tableRow}>
                   <div className={styles.tableCol1}>{client.visitorEmail}</div>
-                  <div className={styles.tableCol2}>{client.propertyTitle}</div>
-                  <div className={styles.tableCol3}>
+                  <div className={styles.tableCol2}>{client.visitorPhone || '-'}</div>
+                  <div className={styles.tableCol3}>{client.propertyTitle}</div>
+                  <div className={styles.tableCol4}>
                     {client.markedAt ? new Date(client.markedAt.toDate()).toLocaleDateString() : '-'}
                   </div>
                 </div>

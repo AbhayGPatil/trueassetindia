@@ -1,9 +1,10 @@
 'use client';
 
-import { useState, useEffect, Suspense } from 'react';
+import { useState, useEffect, Suspense, useContext } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { collection, getDocs, query, where, Query } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
+import { AuthContext } from '@/lib/AuthContext';
 import { useFilterStore } from '@/lib/filterStore';
 import HorizontalFilterBar from '@/components/HorizontalFilterBar';
 import AdvancedFilters from '@/components/AdvancedFilters';
@@ -16,31 +17,48 @@ export const dynamic = 'force-dynamic';
 function ListingsPageContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const { user, loading: authLoading } = useContext(AuthContext);
   const { filters, setPropertyCategory } = useFilterStore();
   const [properties, setProperties] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [sorting, setSorting] = useState('relevance');
   const [showFilters, setShowFilters] = useState(true);
+  const [showLoginPrompt, setShowLoginPrompt] = useState(false);
 
   // Check for type URL parameter and apply filter on mount
   useEffect(() => {
     const typeParam = searchParams.get('type');
-    if (typeParam && !filters.propertyCategory) {
-      setPropertyCategory(typeParam);
+    if (typeParam) {
+      setPropertyCategory(typeParam.toLowerCase());
     }
-  }, [searchParams]);
+  }, [searchParams, setPropertyCategory]);
+
+  useEffect(() => {
+    if (!authLoading && !user) {
+      setShowLoginPrompt(true);
+      setLoading(false);
+    }
+  }, [authLoading, user]);
+
+  useEffect(() => {
+    if (!authLoading && user) {
+      setShowLoginPrompt(false);
+    }
+  }, [authLoading, user]);
 
   // Load properties whenever filters change
   useEffect(() => {
-    loadProperties();
-  }, [filters]);
+    if (!authLoading && user) {
+      loadProperties();
+    }
+  }, [filters, authLoading, user]);
 
   const buildQuery = () => {
     let constraints = [where('status', '==', 'active')];
 
-    // Location filter
-    if (filters.location.city) {
+    // Location filter (exact match for short queries only)
+    if (filters.location.city && filters.location.city.trim().length < 3) {
       constraints.push(where('city', '==', filters.location.city));
     }
 
@@ -76,8 +94,36 @@ function ListingsPageContent() {
 
       // Client-side filtering for more complex filters
       props = props.filter(prop => {
+        const normalize = (value) => (value || '').toString().trim().toLowerCase();
+        const locationQuery = normalize(filters.location.city || filters.location.locality || filters.location.sublocality);
+        if (locationQuery.length > 0) {
+          const haystack = [
+            prop.location,
+            prop.city,
+            prop.area,
+            prop.locality,
+            prop.sublocality,
+            prop.address,
+            prop.title,
+          ]
+            .map(normalize)
+            .filter(Boolean)
+            .join(' ');
+          if (locationQuery.length >= 3) {
+            if (!haystack.includes(locationQuery)) {
+              return false;
+            }
+          } else {
+            const tokens = haystack.split(/\s+/);
+            if (!tokens.includes(locationQuery)) {
+              return false;
+            }
+          }
+        }
+
         // Price filter
-        if (prop.price < filters.price.min || prop.price > filters.price.max) {
+        const priceValue = Number(prop.price || 0);
+        if (priceValue < filters.price.min || priceValue > filters.price.max) {
           return false;
         }
 
@@ -261,6 +307,20 @@ function ListingsPageContent() {
           )}
         </section>
       </div>
+      {showLoginPrompt && (
+        <div className={styles.loginOverlay} role="dialog" aria-modal="true">
+          <div className={styles.loginModal}>
+            <h2 className={styles.loginTitle}>Please Login to explore further and find your dream home</h2>
+            <p className={styles.loginText}>Sign in to view all listings, save favorites, and unlock personalized recommendations.</p>
+            <button
+              className={styles.loginButton}
+              onClick={() => router.push('/auth/login')}
+            >
+              Login
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

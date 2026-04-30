@@ -97,11 +97,36 @@ export default function AddPropertyPage() {
     setVideos(prev => prev.filter((_, i) => i !== index));
   };
 
+  const validateForm = () => {
+    const missingFields = [];
+    
+    if (!formData.title?.trim()) missingFields.push('Property Title');
+    if (!formData.location?.trim()) missingFields.push('Location');
+    if (!formData.price || formData.price <= 0) missingFields.push('Valid Price');
+    if (!formData.type) missingFields.push('Property Type (Buy/Rent)');
+    if (!formData.propertyCategory) missingFields.push('Property Category');
+    
+    if (images.length === 0) missingFields.push('At least 1 Image');
+    
+    if (missingFields.length > 0) {
+      setError(`⚠️ Missing required fields:\n• ${missingFields.join('\n• ')}`);
+      return false;
+    }
+    
+    setError('');
+    return true;
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     
     if (!user) {
       setError('User not authenticated');
+      return;
+    }
+
+    // Validate form first
+    if (!validateForm()) {
       return;
     }
 
@@ -112,14 +137,8 @@ export default function AddPropertyPage() {
       return;
     }
 
-    // Validate form
-    if (!formData.title || !formData.location || !formData.price) {
-      setError('❌ Please fill in all required fields');
-      return;
-    }
-
-    if (images.length === 0) {
-      setError('❌ Please upload at least one image');
+    // Prevent double submission
+    if (uploading) {
       return;
     }
 
@@ -168,8 +187,9 @@ export default function AddPropertyPage() {
         superAreaUnit: formData.superAreaUnit,
         furnishing: formData.furnishing,
         facing: formData.facing,
-        amenities: formData.amenities ? formData.amenities.split(',').map(a => a.trim()) : [],
-        keyHighlights: formData.keyHighlights ? formData.keyHighlights.split(',').map(h => h.trim()) : [],
+        bankAuction: formData.type === 'auction',
+        amenities: formData.amenities ? formData.amenities.split(',').map(a => a.trim()).filter(a => a) : [],
+        keyHighlights: formData.keyHighlights ? formData.keyHighlights.split(',').map(h => h.trim()).filter(h => h) : [],
         images: imageUrls,
         videos: videoUrls,
         uploadedBy: user.uid,
@@ -178,6 +198,7 @@ export default function AddPropertyPage() {
         ownerPhone: userProfile?.whatsapp || userProfile?.phone || '',
         createdAt: serverTimestamp(),
         status: 'active',
+        isVerified: userProfile?.isVerified || false,
       };
 
       // Add document to Firestore
@@ -221,7 +242,6 @@ export default function AddPropertyPage() {
     } catch (err) {
       console.error('❌ Error uploading property:', err);
       setError('❌ Error uploading property: ' + err.message);
-    } finally {
       setUploading(false);
     }
   };
@@ -310,6 +330,7 @@ export default function AddPropertyPage() {
               >
                 <option value="sell">For Sale</option>
                 <option value="rent">For Rent</option>
+                <option value="auction">Bank Auction</option>
               </select>
             </div>
 
@@ -394,6 +415,7 @@ export default function AddPropertyPage() {
                 onChange={handleInputChange}
               >
                 <option value="">Select Layout</option>
+                <option value="1RK">1 RK</option>
                 <option value="1BHK">1 BHK</option>
                 <option value="2BHK">2 BHK</option>
                 <option value="3BHK">3 BHK</option>

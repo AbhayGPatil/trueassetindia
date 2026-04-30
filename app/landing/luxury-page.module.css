@@ -129,6 +129,52 @@
 .navLinks a:hover { color: #0084FF; }
 .navLinks a:hover::after { width: 100%; }
 .navActions { display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
+.profileCard {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 6px 8px 6px 12px;
+  border-radius: 999px;
+  border: 1.5px solid #E2E8F0;
+  background: #ffffff;
+}
+.profileInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+.profileLabel {
+  font-size: 10px;
+  letter-spacing: 0.6px;
+  text-transform: uppercase;
+  font-weight: 700;
+  color: #64748B;
+}
+.profileName {
+  font-size: 13px;
+  font-weight: 700;
+  color: #0A0F1E;
+  max-width: 160px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.logoutBtn {
+  border: none;
+  background: #0A0F1E;
+  color: #ffffff;
+  font-weight: 700;
+  padding: 8px 14px;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  font-size: 12px;
+}
+.logoutBtn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 18px rgba(10,15,30,0.2);
+}
 .postFreeBtn {
   background: #EFF6FF;
   color: #0084FF;
@@ -177,6 +223,60 @@
   background: #0066CC;
   transform: translateY(-1px);
   box-shadow: 0 6px 18px rgba(0,132,255,0.32);
+}
+
+/* ─── Login Prompt Modal ─── */
+.loginOverlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(10, 15, 30, 0.72);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2000;
+  padding: 24px;
+}
+
+.loginModal {
+  background: #ffffff;
+  border-radius: 18px;
+  padding: 32px;
+  max-width: 520px;
+  width: 100%;
+  box-shadow: 0 30px 60px rgba(10, 15, 30, 0.35);
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  text-align: center;
+}
+
+.loginTitle {
+  font-size: 20px;
+  font-weight: 700;
+  color: #0A0F1E;
+  margin: 0;
+}
+
+.loginText {
+  font-size: 14px;
+  color: #475569;
+  margin: 0;
+}
+
+.loginButton {
+  border: none;
+  background: #0084FF;
+  color: #ffffff;
+  font-weight: 700;
+  padding: 12px 20px;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.loginButton:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 14px 28px rgba(0, 132, 255, 0.3);
 }
 
 /* ─── Stats Strip ─── */
@@ -1248,8 +1348,16 @@
 @media (max-width: 768px) {
   .topBar { display: none; }
   .navbar { top: 0; }
+  .navContent {
+    padding: 0 16px;
+    gap: 16px;
+    align-items: center;
+  }
+  .logoText { font-size: 18px; }
+  .logoTag { font-size: 8px; letter-spacing: 1.2px; }
   .navLinks { display: none; }
   .postFreeBtn { display: none; }
+  .navActions { gap: 8px; }
   .statsInner { grid-template-columns: repeat(2, 1fr); }
   .statItem { border-right: none; border-bottom: 1px solid #E8EDF5; padding: 16px 12px; }
   .statItem:nth-child(2n) { border-left: 1px solid #E8EDF5; }
@@ -1257,6 +1365,10 @@
   .typesGrid { grid-template-columns: repeat(3, 1fr); gap: 12px; }
   .rentGrid, .homeLoanGrid, .ownersGrid { grid-template-columns: 1fr; gap: 48px; }
   .rentImg, .ownersImg { height: 380px; }
+  .sectionContainer { padding: 0 16px; }
+  .sectionHeading { margin-bottom: 32px; }
+  .sectionTitle { font-size: clamp(22px, 5vw, 30px); }
+  .sectionSubtitle { font-size: 14px; }
   .insightsHeader { flex-direction: column; align-items: flex-start; gap: 16px; }
   .trendsGrid { grid-template-columns: 1fr; }
   .neighbourhoodGrid { grid-template-columns: repeat(2, 1fr); grid-template-rows: auto; }
@@ -1275,10 +1387,17 @@
   .cityTabs { gap: 8px; }
   .locationsGrid { grid-template-columns: 1fr; }
   .signInBtn { display: none; }
+  .logoText { font-size: 17px; }
+  .logoTag { display: none; }
   .neighbourhoodGrid { grid-template-columns: 1fr; grid-template-rows: auto; }
   .neighbourhoodGrid > :first-child { grid-column: span 1; }
   .rentBtns, .loanBtns, .ownersBtns { flex-direction: column; }
   .ctaBtnPrimary, .ctaBtnOutline { width: 100%; max-width: 320px; }
   .calcCard { padding: 22px 18px; }
   .emiResultValue { font-size: 28px; }
+  .sectionContainer { padding: 0 12px; }
+  .sectionHeading { margin-bottom: 24px; }
+  .sectionSubtitle, .sectionSubtitleLight { font-size: 13px; }
+  .browseTypeSection, .rentSection, .homeLoanSection, .insightsSection, .neighbourhoodSection, .ownersSection, .testimonialsSection, .ctaSection, .footerMain { padding-left: 0; padding-right: 0; }
+  .typesGrid { gap: 10px; }
 }

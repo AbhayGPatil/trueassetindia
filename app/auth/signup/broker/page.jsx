@@ -15,6 +15,7 @@ export default function BrokerSignupPage() {
     whatsapp: '',
     password: '',
     confirmPassword: '',
+    reraId: '',
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -53,6 +54,8 @@ export default function BrokerSignupPage() {
         email: formData.email,
         whatsapp: formData.whatsapp,
         role: 'broker',
+        reraId: formData.reraId || null,
+        isVerified: formData.reraId ? true : false,
         createdAt: new Date().toISOString(),
         subscription: {
           status: 'free',
@@ -210,6 +213,22 @@ export default function BrokerSignupPage() {
                 </div>
                 <div className={styles.whatsappHint}>
                   Enter your <strong>WhatsApp No.</strong> to get enquiries from Buyer/Seller
+                </div>
+              </div>
+
+              {/* RERA ID FIELD - OPTIONAL */}
+              <div className={styles.formGroup}>
+                <label className={styles.formLabel}>RERA Registration ID (if applicable)</label>
+                <input
+                  type="text"
+                  name="reraId"
+                  value={formData.reraId}
+                  onChange={handleChange}
+                  placeholder="e.g., MH-DRT12345-BROKER"
+                  className={styles.formInput}
+                />
+                <div className={styles.whatsappHint}>
+                  Enter your RERA ID to get <strong>VERIFIED</strong> badge on all your properties (Boosts credibility)
                 </div>
               </div>
 

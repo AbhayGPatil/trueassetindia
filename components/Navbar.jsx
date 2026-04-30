@@ -1,15 +1,26 @@
 'use client';
 
 import Link from 'next/link';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useContext } from 'react';
 import { useRouter } from 'next/navigation';
+import { AuthContext } from '@/lib/AuthContext';
 import styles from './Navbar.module.css';
 
 export default function Navbar() {
     const router = useRouter();
+    const { user, userProfile: profile, logout, loading } = useContext(AuthContext);
     const [scrolled, setScrolled] = useState(false);
     const [activeMenu, setActiveMenu] = useState(null);
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
+    const handleLogout = async () => {
+        try {
+            await logout();
+            router.push('/');
+        } catch (error) {
+            console.error('Logout failed:', error);
+        }
+    };
 
     useEffect(() => {
         const handleScroll = () => {
@@ -193,15 +204,31 @@ export default function Navbar() {
 
                 {/* Right Actions */}
                 <div className={styles.navActions}>
-                    <Link href="/auth/login" className={styles.loginBtn}>
-                        Login
-                    </Link>
-                    <Link href="/auth/signup/buyer" className={styles.signUpBtn}>
-                        Sign Up
-                    </Link>
-                    <Link href="/auth/signup/owner" className={styles.postPropertyBtn}>
-                        Post Property <span className={styles.badge}>FREE</span>
-                    </Link>
+                    {loading ? null : user ? (
+                        <div className={styles.profileCard}>
+                            <div className={styles.profileInfo}>
+                                <span className={styles.profileLabel}>Signed in as</span>
+                                <span className={styles.profileName}>
+                                    {profile?.name || profile?.fullName || user.email || 'User'}
+                                </span>
+                            </div>
+                            <button className={styles.logoutBtn} onClick={handleLogout}>
+                                Logout
+                            </button>
+                        </div>
+                    ) : (
+                        <>
+                            <Link href="/auth/login" className={styles.loginBtn}>
+                                Login
+                            </Link>
+                            <Link href="/auth/signup/buyer" className={styles.signUpBtn}>
+                                Sign Up
+                            </Link>
+                            <Link href="/auth/signup/owner" className={styles.postPropertyBtn}>
+                                Post Property <span className={styles.badge}>FREE</span>
+                            </Link>
+                        </>
+                    )}
                 </div>
 
                 {/* Mobile Toggle */}
@@ -313,6 +340,33 @@ export default function Navbar() {
                     {/* Simple Links */}
                     <Link href="/" className={styles.mobileLink}>Advice</Link>
                     <Link href="/" className={styles.mobileLink}>Help</Link>
+
+                    {loading ? null : user ? (
+                        <div className={styles.mobileAuthCard}>
+                            <div className={styles.mobileAuthText}>
+                                Signed in as
+                                <strong>{profile?.name || profile?.fullName || user.email || 'User'}</strong>
+                            </div>
+                            <button
+                                className={styles.mobileLogoutBtn}
+                                onClick={() => {
+                                    setMobileMenuOpen(false);
+                                    handleLogout();
+                                }}
+                            >
+                                Logout
+                            </button>
+                        </div>
+                    ) : (
+                        <div className={styles.mobileAuthActions}>
+                            <Link href="/auth/login" className={styles.mobileAuthLink}>
+                                Login
+                            </Link>
+                            <Link href="/auth/signup/buyer" className={styles.mobileAuthLink}>
+                                Sign Up
+                            </Link>
+                        </div>
+                    )}
                 </div>
             )}
         </nav>

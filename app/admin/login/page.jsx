@@ -21,20 +21,17 @@ export default function AdminLoginPage() {
     }
   }, []);
 
-  const handleLogin = (e) => {
+  const handleLogin = async (e) => {
     e.preventDefault();
     setError('');
     setLoading(true);
-
-    // Simulate network delay
-    setTimeout(() => {
-      if (login(email, password)) {
-        router.push('/admin/dashboard');
-      } else {
-        setError('Invalid email or password');
-      }
-      setLoading(false);
-    }, 500);
+    const success = await login(email, password);
+    if (success) {
+      router.push('/admin/dashboard');
+    } else {
+      setError('Invalid email or password');
+    }
+    setLoading(false);
   };
 
   return (

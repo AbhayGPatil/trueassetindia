@@ -72,13 +72,14 @@ export default function FeaturedPropertiesSection() {
           <>
             <div className={styles.propertiesGrid}>
               {properties.slice(0, 10).map((property, index) => (
-                <PropertyCard 
-                  key={property.id} 
+                <PropertyCard
+                  key={property.id}
                   property={property}
                   showViewMore={index === 9}
                 />
               ))}
             </div>
+            <div className={styles.scrollHint}>Swipe to see more</div>
 
             {properties.length > 0 && (
               <div className={styles.viewMoreContainer}>

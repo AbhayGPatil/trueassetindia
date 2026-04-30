@@ -816,6 +816,13 @@ export default function LuxuryPage() {
           JUGYAH-STYLE FOOTER
       ══════════════════════════════════════════ */}
       <footer className={styles.footer}>
+        {/* Mobile-only: Post Property FREE at top of footer */}
+        <div className={styles.footerMobilePost}>
+          <button className={styles.footerMobilePostBtn} onClick={() => router.push('/auth/signup/owner')}>
+            Post Property FREE
+          </button>
+        </div>
+
         <div className={styles.footerMain}>
           <div className={styles.sectionContainer}>
             <div className={styles.footerGrid}>

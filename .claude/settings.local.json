@@ -1,7 +1,9 @@
 {
   "permissions": {
     "allow": [
-      "WebFetch(domain:jugyah.com)"
+      "WebFetch(domain:jugyah.com)",
+      "Bash(firebase use *)",
+      "Bash(firebase deploy *)"
     ]
   }
 }

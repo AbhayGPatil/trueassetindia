@@ -220,25 +220,51 @@
 
 @media (max-width: 640px) {
   .featuredSection {
-    padding: 32px 12px;
+    padding: 32px 0 32px 12px;
   }
 
   .title {
     font-size: 1.5rem;
+    padding-right: 12px;
   }
 
   .subtitle {
     font-size: 0.95rem;
-    margin-bottom: 30px;
+    margin-bottom: 20px;
+    padding-right: 12px;
   }
 
-  .propertiesGrid,
+  /* Horizontal scroll on mobile */
+  .propertiesGrid {
+    display: flex;
+    overflow-x: auto;
+    gap: 12px;
+    padding-bottom: 12px;
+    padding-right: 12px;
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+    grid-template-columns: none;
+    /* Hide scrollbar but keep scrollable */
+    scrollbar-width: none;
+  }
+
+  .propertiesGrid::-webkit-scrollbar {
+    display: none;
+  }
+
+  .propertiesGrid > * {
+    min-width: 260px;
+    flex-shrink: 0;
+    scroll-snap-align: start;
+  }
+
   .loadingGrid {
     gap: 12px;
   }
 
   .viewMoreContainer {
     padding: 24px 16px;
+    margin-right: 12px;
   }
 
   .viewMoreButton {
@@ -248,28 +274,56 @@
   }
 }
 
+/* Mobile scroll hint arrow — shown only on mobile */
+.scrollHint {
+  display: none;
+}
+
+@media (max-width: 640px) {
+  .scrollHint {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.78rem;
+    color: #999;
+    padding: 6px 0 4px 0;
+    margin-bottom: 16px;
+  }
+
+  .scrollHint::after {
+    content: '→';
+    font-size: 1rem;
+    color: #0084ff;
+  }
+}
+
 @media (max-width: 480px) {
   .featuredSection {
-    padding: 30px 10px;
+    padding: 28px 0 28px 10px;
   }
 
   .title {
-    font-size: 1.5rem;
+    font-size: 1.4rem;
+    padding-right: 10px;
   }
 
   .subtitle {
-    font-size: 0.95rem;
+    font-size: 0.9rem;
+    padding-right: 10px;
   }
 
-  .propertiesGrid,
+  .propertiesGrid > * {
+    min-width: 230px;
+  }
+
   .loadingGrid {
-    grid-template-columns: 1fr;
-    gap: 15px;
+    gap: 12px;
   }
 
   .viewMoreContainer {
     padding: 20px;
     gap: 10px;
+    margin-right: 10px;
   }
 
   .viewMoreButton {

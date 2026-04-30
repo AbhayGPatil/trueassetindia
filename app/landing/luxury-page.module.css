@@ -1112,6 +1112,53 @@
   }
 }
 
+/* ─── 3-column neighbourhood grid on mobile ─── */
+@media (max-width: 640px) {
+  .neighbourhoodGrid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+    overflow-x: unset;
+    padding-bottom: 0;
+    scroll-snap-type: none;
+    flex-wrap: unset;
+  }
+
+  .neighbourhoodGrid > :first-child {
+    grid-column: auto;
+    grid-row: auto;
+  }
+
+  .neighbourhoodCard {
+    min-width: unset;
+    height: 120px;
+    flex-shrink: unset;
+    scroll-snap-align: unset;
+    border-radius: 10px;
+  }
+
+  .neighbourhoodInfo {
+    bottom: 10px;
+    left: 10px;
+  }
+
+  .neighbourhoodName {
+    font-size: 11px;
+    font-weight: 700;
+  }
+
+  .neighbourhoodMeta {
+    font-size: 9px;
+  }
+
+  .neighbourhoodArrow {
+    width: 22px;
+    height: 22px;
+    top: 8px;
+    right: 8px;
+  }
+}
+
 @media (max-width: 480px) {
   .topBarLeft,
   .topBarRight {
@@ -1164,9 +1211,13 @@
     font-size: 11px;
   }
 
-  .trendCard,
-  .neighbourhoodCard {
+  .trendCard {
     min-width: 210px;
+  }
+
+  .neighbourhoodCard {
+    min-width: unset;
+    height: 100px;
   }
 }
 
@@ -1592,6 +1643,30 @@
 .footerColTitle { font-size: 11px; font-weight: 800; color: #fff; text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 20px; }
 .footerLink { display: block; font-size: 13.5px; color: rgba(255,255,255,0.45); text-decoration: none; margin-bottom: 12px; transition: color 0.18s; font-weight: 500; }
 .footerLink:hover { color: #0084FF; }
+/* Mobile-only top footer CTA — hidden on desktop */
+.footerMobilePost {
+  display: none;
+  background: #0A0F1E;
+  padding: 14px 20px;
+  text-align: center;
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+}
+
+.footerMobilePostBtn {
+  background: #0084FF;
+  color: #fff;
+  border: none;
+  padding: 8px 22px;
+  border-radius: 8px;
+  font-weight: 700;
+  font-size: 13px;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-family: 'DM Sans', sans-serif;
+}
+
+.footerMobilePostBtn:hover { background: #0066CC; transform: translateY(-1px); }
+
 .footerPostBtn {
   background: #0084FF;
   color: #fff;
@@ -1673,6 +1748,9 @@
   .footerBottomInner { flex-direction: column; text-align: center; gap: 10px; }
   .footerBottomLinks { justify-content: center; }
   .ctaBtns { flex-direction: column; align-items: center; }
+  /* Show mobile top footer button, hide the one buried in Company column */
+  .footerMobilePost { display: block; }
+  .footerPostBtn { display: none; }
   .ownerFeatureGrid { grid-template-columns: 1fr; }
   .rentBtns, .loanBtns, .ownersBtns { flex-direction: column; }
   .ctaBtnPrimary, .ctaBtnOutline { width: 100%; max-width: none; }

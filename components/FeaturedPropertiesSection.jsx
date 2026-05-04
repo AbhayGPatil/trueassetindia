@@ -35,6 +35,13 @@ export default function FeaturedPropertiesSection() {
         setError('');
       } catch (error) {
         console.error('Error fetching properties:', error);
+        if (error?.code === 'permission-denied') {
+          console.error(
+            "Firestore permission-denied while fetching properties. " +
+            "This usually means Firestore Rules (or Firebase App Check enforcement) are blocking reads in the deployed Firebase project. " +
+            "Confirm you're using the correct projectId in NEXT_PUBLIC_FIREBASE_PROJECT_ID on Vercel and that the /properties rules allow reading status='active'."
+          );
+        }
         setError(error.message);
         setProperties([]);
       } finally {

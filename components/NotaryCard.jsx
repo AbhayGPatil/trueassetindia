@@ -45,14 +45,14 @@ export default function NotaryCard({ notary, onContact }) {
             <img src={notary.profilePictureUrl} alt={notary.firstName} />
           ) : (
             <div className={styles.placeholderPic}>
-              {notary.firstName.charAt(0)}{notary.lastName.charAt(0)}
+              {notary.firstName?.charAt(0) ?? 'N'}{notary.lastName?.charAt(0) ?? 'P'}
             </div>
           )}
         </div>
         
         <div className={styles.headerInfo}>
           <h3 className={styles.name}>
-            {notary.firstName} {notary.lastName}
+            {notary.firstName || 'Notary'} {notary.lastName || 'Professional'}
           </h3>
           <p className={styles.city}>📍 {notary.city || 'City'}</p>
         </div>

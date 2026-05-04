@@ -45,8 +45,8 @@ export default function NotariesPage() {
   }, []);
 
   const filteredNotaries = notaries.filter(notary => {
-    const matchesSearch = 
-      `${notary.firstName} ${notary.lastName}`.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    const matchesSearch =
+      `${notary.firstName || ''} ${notary.lastName || ''}`.toLowerCase().includes(searchTerm.toLowerCase()) ||
       (notary.expertise && notary.expertise.toLowerCase().includes(searchTerm.toLowerCase()));
 
     const matchesCity = !filterCity || notary.city === filterCity;

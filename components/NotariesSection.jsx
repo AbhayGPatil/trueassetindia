@@ -31,6 +31,13 @@ export default function NotariesSection() {
         setNotaries(notariesData);
       } catch (err) {
         console.error('Error fetching notaries:', err);
+        if (err?.code === 'permission-denied') {
+          console.error(
+            "Firestore permission-denied while fetching notaries. " +
+            "This usually means Firestore Rules (or Firebase App Check enforcement) are blocking reads in the deployed Firebase project. " +
+            "If you want notaries visible without login, add a rule allowing reads when profilePublished==true and subscriptionStatus=='active'."
+          );
+        }
         setError('Failed to load notaries');
       } finally {
         setLoading(false);

@@ -48,8 +48,7 @@ export default function NotariesSection() {
   }, []);
 
   const handleContactNotary = (notary) => {
-    // Open contact modal or redirect to notary details page
-    window.location.href = `/notary/${notary.id}`;
+    // Modal is now handled within NotaryCard component
   };
 
   if (loading) {

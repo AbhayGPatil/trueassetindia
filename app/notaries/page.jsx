@@ -56,9 +56,7 @@ export default function NotariesPage() {
   });
 
   const handleContactNotary = (notary) => {
-    // Could open a modal or redirect to detail page
-    // For now, just copy phone to clipboard or open phone app
-    window.location.href = `tel:${notary.phone}`;
+    // Modal is now handled within NotaryCard component
   };
 
   return (

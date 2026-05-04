@@ -1,8 +1,12 @@
 'use client';
 
+import { useState } from 'react';
 import styles from './NotaryCard.module.css';
+import NotaryContactModal from './NotaryContactModal';
 
 export default function NotaryCard({ notary, onContact }) {
+  const [modalOpen, setModalOpen] = useState(false);
+
   const handleCall = () => {
     window.location.href = `tel:${notary.phone}`;
   };
@@ -12,12 +16,9 @@ export default function NotaryCard({ notary, onContact }) {
   };
 
   const handleContact = () => {
-    if (onContact) {
-      onContact(notary);
-    }
+    setModalOpen(true);
   };
 
-  // Calculate badge level based on registrations
   const getBadgeLevel = () => {
     const registrations = parseInt(notary.registrationsDone) || 0;
     if (registrations >= 500) return 'platinum';
@@ -30,99 +31,88 @@ export default function NotaryCard({ notary, onContact }) {
 
   return (
     <div className={styles.card}>
-      {/* Badge */}
-      <div className={`${styles.badge} ${styles[badgeLevel]}`}>
-        {badgeLevel === 'platinum' && '🏆 Platinum'}
-        {badgeLevel === 'gold' && '⭐ Gold'}
-        {badgeLevel === 'silver' && '✨ Silver'}
-        {badgeLevel === 'standard' && 'Verified'}
-      </div>
+      {/* Content Section */}
+      <div className={styles.contentSection}>
+        <p className={styles.expertise}>{notary.expertise || 'Notary Professional'}</p>
 
-      {/* Header with Profile Picture and Name */}
-      <div className={styles.header}>
-        <div className={styles.profilePicture}>
-          {notary.profilePictureUrl ? (
-            <img src={notary.profilePictureUrl} alt={notary.firstName} />
-          ) : (
-            <div className={styles.placeholderPic}>
-              {notary.firstName?.charAt(0) ?? 'N'}{notary.lastName?.charAt(0) ?? 'P'}
-            </div>
-          )}
-        </div>
-        
-        <div className={styles.headerInfo}>
-          <h3 className={styles.name}>
-            {notary.firstName || 'Notary'} {notary.lastName || 'Professional'}
-          </h3>
-          <p className={styles.city}>📍 {notary.city || 'City'}</p>
+        {notary.bio && (
+          <p className={styles.bio}>{notary.bio}</p>
+        )}
+
+        <div className={styles.statsRow}>
+          <div className={styles.statBox}>
+            <span className={styles.statNumber}>{notary.experience}</span>
+            <span className={styles.statName}>Experience</span>
+          </div>
+          <div className={styles.statBox}>
+            <span className={styles.statNumber}>{notary.registrationsDone || 0}</span>
+            <span className={styles.statName}>Registrations</span>
+          </div>
         </div>
       </div>
 
-      {/* Professional Info */}
+      {/* Bottom Info Section */}
       <div className={styles.infoSection}>
-        <div className={styles.company}>
-          <p className={styles.label}>Registration #</p>
-          <p className={styles.value}>{notary.registrationNumber}</p>
-        </div>
-
-        <div className={styles.stats}>
-          <div className={styles.statItem}>
-            <span className={styles.statValue}>{notary.experience}</span>
-            <span className={styles.statLabel}>Experience</span>
+        <div className={styles.profileWrapper}>
+          <div className={styles.profilePicture}>
+            {notary.profilePictureUrl ? (
+              <img src={notary.profilePictureUrl} alt={notary.firstName} />
+            ) : (
+              <div className={styles.placeholderPic}>
+                {notary.firstName?.charAt(0) ?? 'N'}{notary.lastName?.charAt(0) ?? 'P'}
+              </div>
+            )}
           </div>
-          <div className={styles.statItem}>
-            <span className={styles.statValue}>{notary.registrationsDone || 0}</span>
-            <span className={styles.statLabel}>Registrations</span>
+
+          <div className={styles.userInfo}>
+            <h3 className={styles.name}>
+              {notary.firstName || 'Notary'} {notary.lastName || 'Professional'}
+            </h3>
+            <p className={styles.role}>Notary Professional</p>
+            <p className={styles.city}>{notary.city || 'City'}</p>
+          </div>
+
+          <div className={`${styles.badge} ${styles[badgeLevel]}`}>
+            {badgeLevel === 'platinum' && 'Platinum'}
+            {badgeLevel === 'gold' && 'Gold'}
+            {badgeLevel === 'silver' && 'Silver'}
+            {badgeLevel === 'standard' && 'Verified'}
           </div>
         </div>
-      </div>
 
-      {/* Expertise */}
-      {notary.expertise && (
-        <div className={styles.expertise}>
-          <p className={styles.label}>Expertise</p>
-          <p className={styles.value}>{notary.expertise}</p>
-        </div>
-      )}
-
-      {/* Contact Section */}
-      <div className={styles.contactSection}>
-        <div className={styles.contactMethod}>
+        {/* Contact Buttons */}
+        <div className={styles.contactSection}>
           <button
             onClick={handleCall}
             className={styles.contactBtn}
             title="Call"
           >
-            <span className={styles.icon}>📞</span>
-            <span className={styles.text}>{notary.phone}</span>
+            Call: {notary.phone}
           </button>
-        </div>
-        <div className={styles.contactMethod}>
           <button
             onClick={handleEmail}
             className={styles.contactBtn}
             title="Email"
           >
-            <span className={styles.icon}>✉️</span>
-            <span className={styles.text}>Email</span>
+            Send Email
           </button>
         </div>
+
+        {/* CTA Button */}
+        <button
+          onClick={handleContact}
+          className={styles.ctaBtn}
+        >
+          Get Services
+        </button>
       </div>
 
-      {/* CTA Button */}
-      <button
-        onClick={handleContact}
-        className={styles.ctaBtn}
-      >
-        Get Services
-      </button>
-
-      {/* Bio */}
-      {notary.bio && (
-        <div className={styles.bio}>
-          <p>{notary.bio}</p>
-        </div>
-      )}
+      {/* Contact Modal */}
+      <NotaryContactModal
+        notary={notary}
+        isOpen={modalOpen}
+        onClose={() => setModalOpen(false)}
+      />
     </div>
   );
 }
